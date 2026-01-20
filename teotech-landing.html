@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeoTech | Tecnología Accesible para Todos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        :root {
+            --blue-dark: #056CF2;
+            --blue-primary: #0583F2;
+            --blue-light: #66B1F2;
+            --blue-pale: #B3D5F2;
+            --blue-bright: #0597F2;
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--white);
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        #root {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Hook for scroll animations
+        const useScrollAnimation = (threshold = 0.1) => {
+            const ref = useRef(null);
+            const [isVisible, setIsVisible] = useState(false);
+
+            useEffect(() => {
+                const observer = new IntersectionObserver(
+                    ([entry]) => {
+                        if (entry.isIntersecting) {
+                            setIsVisible(true);
+                        }
+                    },
+                    { threshold, rootMargin: '0px 0px -50px 0px' }
+                );
+
+                if (ref.current) {
+                    observer.observe(ref.current);
+                }
+
+                return () => observer.disconnect();
+            }, [threshold]);
+
+            return [ref, isVisible];
+        };
+
+        // Animated component wrapper
+        const AnimatedSection = ({ children, delay = 0, className = '' }) => {
+            const [ref, isVisible] = useScrollAnimation();
+            
+            return (
+                <div
+                    ref={ref}
+                    className={className}
+                    style={{
+                        opacity: isVisible ? 1 : 0,
+                        transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+                        transition: `all 0.7s cubic-bezier(0.4, 0, 0.2, 1) ${delay}s`
+                    }}
+                >
+                    {children}
+                </div>
+            );
+        };
+
+        // Navigation Component
+        const Navigation = () => {
+            const [scrolled, setScrolled] = useState(false);
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    setScrolled(window.scrollY > 50);
+                };
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const navStyle = {
+                position: 'fixed',
+                top: 0,
+                width: '100%',
+                padding: scrolled ? '1rem 5%' : '1.5rem 5%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                zIndex: 1000,
+                background: scrolled ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                backdropFilter: scrolled ? 'blur(20px)' : 'none',
+                boxShadow: scrolled ? '0 4px 30px rgba(5, 108, 242, 0.08)' : 'none',
+                transition: 'all 0.3s ease'
+            };
+
+            const logoStyle = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                textDecoration: 'none'
+            };
+
+            const logoIconStyle = {
+                width: '45px',
+                height: '45px',
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: '800',
+                fontSize: '1.2rem'
+            };
+
+            const logoTextStyle = {
+                fontSize: '1.6rem',
+                fontWeight: '800',
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+            };
+
+            const navLinksStyle = {
+                display: 'flex',
+                gap: '2.5rem',
+                listStyle: 'none',
+                alignItems: 'center'
+            };
+
+            const linkStyle = {
+                color: '#475569',
+                textDecoration: 'none',
+                fontWeight: '600',
+                fontSize: '0.95rem',
+                transition: 'color 0.3s ease',
+                cursor: 'pointer'
+            };
+
+            const ctaButtonStyle = {
+                padding: '0.75rem 1.5rem',
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50px',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: '700',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 15px rgba(5, 151, 242, 0.3)'
+            };
+
+            return (
+                <nav style={navStyle}>
+                    <a href="#" style={logoStyle}>
+                        <div style={logoIconStyle}>T</div>
+                        <span style={logoTextStyle}>TeoTech</span>
+                    </a>
+                    <ul style={navLinksStyle}>
+                        <li><a href="#servicios" style={linkStyle}>Servicios</a></li>
+                        <li><a href="#como-funciona" style={linkStyle}>Cómo Funciona</a></li>
+                        <li><a href="#beneficios" style={linkStyle}>Beneficios</a></li>
+                        <li><a href="#contacto" style={linkStyle}>Contacto</a></li>
+                        <li>
+                            <button style={ctaButtonStyle}>Comenzar Ahora</button>
+                        </li>
+                    </ul>
+                </nav>
+            );
+        };
+
+        // Hero Section
+        const Hero = () => {
+            const containerStyle = {
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '120px 5% 80px',
+                background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)',
+                position: 'relative',
+                overflow: 'hidden'
+            };
+
+            const bgDecorStyle = {
+                position: 'absolute',
+                top: '-20%',
+                right: '-10%',
+                width: '60%',
+                height: '140%',
+                background: 'radial-gradient(ellipse at center, rgba(5, 151, 242, 0.08) 0%, transparent 70%)',
+                pointerEvents: 'none'
+            };
+
+            const contentStyle = {
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '4rem',
+                alignItems: 'center',
+                maxWidth: '1400px',
+                margin: '0 auto',
+                width: '100%'
+            };
+
+            const textContentStyle = {
+                maxWidth: '600px'
+            };
+
+            const badgeStyle = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.5rem 1rem',
+                background: 'rgba(5, 151, 242, 0.1)',
+                border: '1px solid rgba(5, 151, 242, 0.2)',
+                borderRadius: '50px',
+                fontSize: '0.85rem',
+                fontWeight: '600',
+                color: '#0597F2',
+                marginBottom: '1.5rem'
+            };
+
+            const headingStyle = {
+                fontSize: '3.5rem',
+                fontWeight: '900',
+                lineHeight: '1.15',
+                color: '#0f172a',
+                marginBottom: '1.5rem'
+            };
+
+            const highlightStyle = {
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+            };
+
+            const descriptionStyle = {
+                fontSize: '1.2rem',
+                color: '#475569',
+                lineHeight: '1.8',
+                marginBottom: '2.5rem'
+            };
+
+            const buttonsStyle = {
+                display: 'flex',
+                gap: '1rem',
+                flexWrap: 'wrap'
+            };
+
+            const primaryBtnStyle = {
+                padding: '1rem 2.5rem',
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50px',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: '700',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                boxShadow: '0 10px 30px rgba(5, 151, 242, 0.3)',
+                transition: 'all 0.3s ease'
+            };
+
+            const secondaryBtnStyle = {
+                padding: '1rem 2.5rem',
+                background: 'transparent',
+                color: '#0597F2',
+                border: '2px solid #0597F2',
+                borderRadius: '50px',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: '700',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+            };
+
+            const imageContainerStyle = {
+                position: 'relative',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            };
+
+            const imageBoxStyle = {
+                width: '100%',
+                maxWidth: '500px',
+                aspectRatio: '4/3',
+                background: 'linear-gradient(145deg, #f1f5f9, #e2e8f0)',
+                borderRadius: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: '0 25px 50px rgba(5, 108, 242, 0.15)'
+            };
+
+            const placeholderStyle = {
+                color: '#94a3b8',
+                fontSize: '1rem',
+                fontWeight: '600',
+                textAlign: 'center',
+                padding: '2rem'
+            };
+
+            const floatingCard1 = {
+                position: 'absolute',
+                top: '-20px',
+                right: '-30px',
+                background: 'white',
+                padding: '1rem 1.5rem',
+                borderRadius: '16px',
+                boxShadow: '0 15px 40px rgba(5, 108, 242, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                animation: 'float 4s ease-in-out infinite'
+            };
+
+            const floatingCard2 = {
+                position: 'absolute',
+                bottom: '20px',
+                left: '-40px',
+                background: 'white',
+                padding: '1rem 1.5rem',
+                borderRadius: '16px',
+                boxShadow: '0 15px 40px rgba(5, 108, 242, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                animation: 'float 5s ease-in-out infinite reverse'
+            };
+
+            const iconCircleStyle = {
+                width: '40px',
+                height: '40px',
+                background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.15), rgba(5, 108, 242, 0.1))',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#0597F2',
+                fontSize: '1.2rem'
+            };
+
+            return (
+                <section style={containerStyle}>
+                    <div style={bgDecorStyle}></div>
+                    <div style={contentStyle}>
+                        <AnimatedSection>
+                            <div style={textContentStyle}>
+                                <div style={badgeStyle}>
+                                    <span>✨</span>
+                                    <span>Tecnología para todos</span>
+                                </div>
+                                <h1 style={headingStyle}>
+                                    Impulsa tu negocio con <span style={highlightStyle}>tecnología accesible</span>
+                                </h1>
+                                <p style={descriptionStyle}>
+                                    Conectamos personas y negocios con programadores profesionales. 
+                                    Desarrollo web, apps y soluciones digitales a medida, de forma sencilla y al alcance de todos.
+                                </p>
+                                <div style={buttonsStyle}>
+                                    <button style={primaryBtnStyle}>Solicitar Cotización</button>
+                                    <button style={secondaryBtnStyle}>Ver Servicios</button>
+                                </div>
+                            </div>
+                        </AnimatedSection>
+                        
+                        <AnimatedSection delay={0.2}>
+                            <div style={imageContainerStyle}>
+                                <div style={imageBoxStyle}>
+                                    <p style={placeholderStyle}>
+                                        📷 Espacio para imagen hero<br/>
+                                        <small>(Dashboard o equipo trabajando)</small>
+                                    </p>
+                                </div>
+                                <div style={floatingCard1}>
+                                    <div style={iconCircleStyle}>💻</div>
+                                    <div>
+                                        <div style={{fontWeight: '700', color: '#0f172a', fontSize: '0.9rem'}}>+50 Proyectos</div>
+                                        <div style={{fontSize: '0.8rem', color: '#64748b'}}>Completados</div>
+                                    </div>
+                                </div>
+                                <div style={floatingCard2}>
+                                    <div style={iconCircleStyle}>⭐</div>
+                                    <div>
+                                        <div style={{fontWeight: '700', color: '#0f172a', fontSize: '0.9rem'}}>100% Satisfacción</div>
+                                        <div style={{fontSize: '0.8rem', color: '#64748b'}}>Garantizada</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </AnimatedSection>
+                    </div>
+                    
+                    <style>{`
+                        @keyframes float {
+                            0%, 100% { transform: translateY(0); }
+                            50% { transform: translateY(-15px); }
+                        }
+                    `}</style>
+                </section>
+            );
+        };
+
+        // Trusted By Section
+        const TrustedBy = () => {
+            const containerStyle = {
+                padding: '4rem 5%',
+                background: 'white',
+                borderTop: '1px solid #e2e8f0',
+                borderBottom: '1px solid #e2e8f0'
+            };
+
+            const contentStyle = {
+                maxWidth: '1200px',
+                margin: '0 auto',
+                textAlign: 'center'
+            };
+
+            const titleStyle = {
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                color: '#94a3b8',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                marginBottom: '2rem'
+            };
+
+            const logosStyle = {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '4rem',
+                flexWrap: 'wrap'
+            };
+
+            const logoPlaceholderStyle = {
+                width: '120px',
+                height: '40px',
+                background: '#f1f5f9',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#94a3b8',
+                fontSize: '0.75rem',
+                fontWeight: '600'
+            };
+
+            return (
+                <section style={containerStyle}>
+                    <AnimatedSection>
+                        <div style={contentStyle}>
+                            <p style={titleStyle}>Confían en nosotros</p>
+                            <div style={logosStyle}>
+                                <div style={logoPlaceholderStyle}>Logo 1</div>
+                                <div style={logoPlaceholderStyle}>Logo 2</div>
+                                <div style={logoPlaceholderStyle}>Logo 3</div>
+                                <div style={logoPlaceholderStyle}>Logo 4</div>
+                                <div style={logoPlaceholderStyle}>Logo 5</div>
+                            </div>
+                        </div>
+                    </AnimatedSection>
+                </section>
+            );
+        };
+
+        // Services Section
+        const Services = () => {
+            const containerStyle = {
+                padding: '100px 5%',
+                background: 'white'
+            };
+
+            const contentStyle = {
+                maxWidth: '1200px',
+                margin: '0 auto'
+            };
+
+            const headerStyle = {
+                textAlign: 'center',
+                marginBottom: '4rem'
+            };
+
+            const labelStyle = {
+                display: 'inline-block',
+                padding: '0.5rem 1rem',
+                background: 'rgba(5, 151, 242, 0.1)',
+                borderRadius: '50px',
+                fontSize: '0.85rem',
+                fontWeight: '700',
+                color: '#0597F2',
+                marginBottom: '1rem'
+            };
+
+            const titleStyle = {
+                fontSize: '2.8rem',
+                fontWeight: '800',
+                color: '#0f172a',
+                marginBottom: '1rem'
+            };
+
+            const subtitleStyle = {
+                fontSize: '1.1rem',
+                color: '#64748b',
+                maxWidth: '600px',
+                margin: '0 auto',
+                lineHeight: '1.7'
+            };
+
+            const gridStyle = {
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gap: '2rem'
+            };
+
+            const services = [
+                {
+                    icon: '🌐',
+                    title: 'Desarrollo Web',
+                    description: 'Sitios web modernos, rápidos y optimizados para convertir visitantes en clientes.',
+                    features: ['Landing Pages', 'E-commerce', 'Portales Web']
+                },
+                {
+                    icon: '📱',
+                    title: 'Aplicaciones Móviles',
+                    description: 'Apps nativas y multiplataforma que llevan tu negocio al bolsillo de tus clientes.',
+                    features: ['iOS & Android', 'Apps Híbridas', 'PWA']
+                },
+                {
+                    icon: '⚙️',
+                    title: 'Software a Medida',
+                    description: 'Sistemas personalizados que automatizan y optimizan los procesos de tu negocio.',
+                    features: ['CRM', 'Inventarios', 'Gestión']
+                },
+                {
+                    icon: '🎨',
+                    title: 'Diseño UI/UX',
+                    description: 'Interfaces atractivas y experiencias de usuario que enamoran a tus clientes.',
+                    features: ['Prototipos', 'Branding', 'Diseño Web']
+                },
+                {
+                    icon: '📊',
+                    title: 'Consultoría Tech',
+                    description: 'Te asesoramos para elegir las mejores soluciones tecnológicas para tu negocio.',
+                    features: ['Análisis', 'Estrategia', 'Optimización']
+                },
+                {
+                    icon: '🔧',
+                    title: 'Mantenimiento',
+                    description: 'Soporte continuo para que tus sistemas siempre funcionen al 100%.',
+                    features: ['Actualizaciones', 'Soporte 24/7', 'Backups']
+                }
+            ];
+
+            const ServiceCard = ({ service, index }) => {
+                const [isHovered, setIsHovered] = useState(false);
+
+                const cardStyle = {
+                    background: isHovered ? 'linear-gradient(145deg, #ffffff, #f8fafc)' : 'white',
+                    border: `1px solid ${isHovered ? '#0597F2' : '#e2e8f0'}`,
+                    borderRadius: '20px',
+                    padding: '2.5rem',
+                    transition: 'all 0.4s ease',
+                    transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
+                    boxShadow: isHovered ? '0 25px 50px rgba(5, 151, 242, 0.15)' : '0 4px 20px rgba(0,0,0,0.03)',
+                    cursor: 'pointer'
+                };
+
+                const iconStyle = {
+                    width: '70px',
+                    height: '70px',
+                    background: isHovered 
+                        ? 'linear-gradient(135deg, #0597F2, #056CF2)' 
+                        : 'linear-gradient(135deg, rgba(5, 151, 242, 0.1), rgba(5, 108, 242, 0.05))',
+                    borderRadius: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '2rem',
+                    marginBottom: '1.5rem',
+                    transition: 'all 0.4s ease',
+                    filter: isHovered ? 'grayscale(1) brightness(10)' : 'none'
+                };
+
+                const cardTitleStyle = {
+                    fontSize: '1.4rem',
+                    fontWeight: '800',
+                    color: '#0f172a',
+                    marginBottom: '0.75rem'
+                };
+
+                const cardDescStyle = {
+                    color: '#64748b',
+                    lineHeight: '1.7',
+                    marginBottom: '1.5rem'
+                };
+
+                const featuresStyle = {
+                    display: 'flex',
+                    gap: '0.5rem',
+                    flexWrap: 'wrap'
+                };
+
+                const featureTagStyle = {
+                    padding: '0.4rem 0.8rem',
+                    background: 'rgba(5, 151, 242, 0.08)',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    color: '#0597F2'
+                };
+
+                return (
+                    <AnimatedSection delay={index * 0.1}>
+                        <div 
+                            style={cardStyle}
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                        >
+                            <div style={iconStyle}>{service.icon}</div>
+                            <h3 style={cardTitleStyle}>{service.title}</h3>
+                            <p style={cardDescStyle}>{service.description}</p>
+                            <div style={featuresStyle}>
+                                {service.features.map((feature, i) => (
+                                    <span key={i} style={featureTagStyle}>{feature}</span>
+                                ))}
+                            </div>
+                        </div>
+                    </AnimatedSection>
+                );
+            };
+
+            return (
+                <section id="servicios" style={containerStyle}>
+                    <div style={contentStyle}>
+                        <AnimatedSection>
+                            <div style={headerStyle}>
+                                <span style={labelStyle}>Nuestros Servicios</span>
+                                <h2 style={titleStyle}>Soluciones para cada necesidad</h2>
+                                <p style={subtitleStyle}>
+                                    Ofrecemos un amplio catálogo de servicios tecnológicos adaptados al tamaño y presupuesto de tu negocio.
+                                </p>
+                            </div>
+                        </AnimatedSection>
+                        
+                        <div style={gridStyle}>
+                            {services.map((service, index) => (
+                                <ServiceCard key={index} service={service} index={index} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // How It Works Section
+        const HowItWorks = () => {
+            const containerStyle = {
+                padding: '100px 5%',
+                background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)'
+            };
+
+            const contentStyle = {
+                maxWidth: '1200px',
+                margin: '0 auto'
+            };
+
+            const headerStyle = {
+                textAlign: 'center',
+                marginBottom: '5rem'
+            };
+
+            const labelStyle = {
+                display: 'inline-block',
+                padding: '0.5rem 1rem',
+                background: 'rgba(5, 151, 242, 0.1)',
+                borderRadius: '50px',
+                fontSize: '0.85rem',
+                fontWeight: '700',
+                color: '#0597F2',
+                marginBottom: '1rem'
+            };
+
+            const titleStyle = {
+                fontSize: '2.8rem',
+                fontWeight: '800',
+                color: '#0f172a',
+                marginBottom: '1rem'
+            };
+
+            const stepsContainerStyle = {
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '2rem',
+                position: 'relative'
+            };
+
+            const steps = [
+                { number: '01', title: 'Cuéntanos tu idea', description: 'Describe lo que necesitas. Sin tecnicismos, en tus propias palabras.' },
+                { number: '02', title: 'Recibe propuestas', description: 'Te presentamos opciones claras con precios y tiempos definidos.' },
+                { number: '03', title: 'Desarrollamos', description: 'Nuestros expertos trabajan en tu proyecto con actualizaciones constantes.' },
+                { number: '04', title: '¡Listo para usar!', description: 'Entregamos tu solución funcionando y te capacitamos para usarla.' }
+            ];
+
+            const StepCard = ({ step, index }) => {
+                const cardStyle = {
+                    textAlign: 'center',
+                    padding: '2rem 1.5rem',
+                    position: 'relative'
+                };
+
+                const numberStyle = {
+                    fontSize: '4rem',
+                    fontWeight: '900',
+                    background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.15), rgba(5, 108, 242, 0.05))',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    marginBottom: '1rem'
+                };
+
+                const stepTitleStyle = {
+                    fontSize: '1.3rem',
+                    fontWeight: '800',
+                    color: '#0f172a',
+                    marginBottom: '0.75rem'
+                };
+
+                const stepDescStyle = {
+                    color: '#64748b',
+                    lineHeight: '1.7',
+                    fontSize: '0.95rem'
+                };
+
+                const connectorStyle = {
+                    position: 'absolute',
+                    top: '3rem',
+                    right: '-1rem',
+                    width: '2rem',
+                    height: '2px',
+                    background: 'linear-gradient(90deg, #0597F2, #B3D5F2)',
+                    display: index < 3 ? 'block' : 'none'
+                };
+
+                return (
+                    <AnimatedSection delay={index * 0.15}>
+                        <div style={cardStyle}>
+                            <div style={numberStyle}>{step.number}</div>
+                            <h3 style={stepTitleStyle}>{step.title}</h3>
+                            <p style={stepDescStyle}>{step.description}</p>
+                            <div style={connectorStyle}></div>
+                        </div>
+                    </AnimatedSection>
+                );
+            };
+
+            return (
+                <section id="como-funciona" style={containerStyle}>
+                    <div style={contentStyle}>
+                        <AnimatedSection>
+                            <div style={headerStyle}>
+                                <span style={labelStyle}>Proceso Simple</span>
+                                <h2 style={titleStyle}>¿Cómo funciona?</h2>
+                            </div>
+                        </AnimatedSection>
+                        
+                        <div style={stepsContainerStyle}>
+                            {steps.map((step, index) => (
+                                <StepCard key={index} step={step} index={index} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Benefits Section
+        const Benefits = () => {
+            const containerStyle = {
+                padding: '100px 5%',
+                background: 'white'
+            };
+
+            const contentStyle = {
+                maxWidth: '1200px',
+                margin: '0 auto',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '5rem',
+                alignItems: 'center'
+            };
+
+            const imageContainerStyle = {
+                position: 'relative'
+            };
+
+            const imageBoxStyle = {
+                width: '100%',
+                aspectRatio: '1',
+                background: 'linear-gradient(145deg, #f1f5f9, #e2e8f0)',
+                borderRadius: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 25px 50px rgba(5, 108, 242, 0.1)'
+            };
+
+            const placeholderStyle = {
+                color: '#94a3b8',
+                fontSize: '1rem',
+                fontWeight: '600',
+                textAlign: 'center',
+                padding: '2rem'
+            };
+
+            const accentBoxStyle = {
+                position: 'absolute',
+                bottom: '-30px',
+                right: '-30px',
+                width: '200px',
+                height: '200px',
+                background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.1), rgba(5, 108, 242, 0.05))',
+                borderRadius: '24px',
+                zIndex: -1
+            };
+
+            const textContentStyle = {
+                padding: '1rem 0'
+            };
+
+            const labelStyle = {
+                display: 'inline-block',
+                padding: '0.5rem 1rem',
+                background: 'rgba(5, 151, 242, 0.1)',
+                borderRadius: '50px',
+                fontSize: '0.85rem',
+                fontWeight: '700',
+                color: '#0597F2',
+                marginBottom: '1rem'
+            };
+
+            const titleStyle = {
+                fontSize: '2.5rem',
+                fontWeight: '800',
+                color: '#0f172a',
+                marginBottom: '1.5rem',
+                lineHeight: '1.2'
+            };
+
+            const descStyle = {
+                color: '#64748b',
+                lineHeight: '1.8',
+                marginBottom: '2rem',
+                fontSize: '1.05rem'
+            };
+
+            const benefitsListStyle = {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.25rem'
+            };
+
+            const benefits = [
+                { icon: '💰', title: 'Precios accesibles', desc: 'Soluciones ajustadas a tu presupuesto' },
+                { icon: '🎯', title: 'Sin tecnicismos', desc: 'Te explicamos todo de forma clara' },
+                { icon: '⚡', title: 'Entregas rápidas', desc: 'Proyectos en tiempo récord' },
+                { icon: '🤝', title: 'Soporte continuo', desc: 'Te acompañamos después de entregar' }
+            ];
+
+            const BenefitItem = ({ benefit }) => {
+                const itemStyle = {
+                    display: 'flex',
+                    gap: '1rem',
+                    alignItems: 'flex-start'
+                };
+
+                const iconStyle = {
+                    width: '50px',
+                    height: '50px',
+                    background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.1), rgba(5, 108, 242, 0.05))',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.5rem',
+                    flexShrink: 0
+                };
+
+                const textStyle = {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.25rem'
+                };
+
+                const itemTitleStyle = {
+                    fontWeight: '700',
+                    color: '#0f172a',
+                    fontSize: '1.05rem'
+                };
+
+                const itemDescStyle = {
+                    color: '#64748b',
+                    fontSize: '0.9rem'
+                };
+
+                return (
+                    <div style={itemStyle}>
+                        <div style={iconStyle}>{benefit.icon}</div>
+                        <div style={textStyle}>
+                            <span style={itemTitleStyle}>{benefit.title}</span>
+                            <span style={itemDescStyle}>{benefit.desc}</span>
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <section id="beneficios" style={containerStyle}>
+                    <div style={contentStyle}>
+                        <AnimatedSection>
+                            <div style={imageContainerStyle}>
+                                <div style={imageBoxStyle}>
+                                    <p style={placeholderStyle}>
+                                        📷 Espacio para imagen<br/>
+                                        <small>(Equipo colaborando o cliente feliz)</small>
+                                    </p>
+                                </div>
+                                <div style={accentBoxStyle}></div>
+                            </div>
+                        </AnimatedSection>
+                        
+                        <AnimatedSection delay={0.2}>
+                            <div style={textContentStyle}>
+                                <span style={labelStyle}>¿Por qué TeoTech?</span>
+                                <h2 style={titleStyle}>Tecnología que entiende tu negocio</h2>
+                                <p style={descStyle}>
+                                    Sabemos que la tecnología puede parecer complicada. Por eso, 
+                                    nos encargamos de todo el proceso técnico mientras tú te enfocas 
+                                    en lo que mejor sabes hacer: tu negocio.
+                                </p>
+                                <div style={benefitsListStyle}>
+                                    {benefits.map((benefit, index) => (
+                                        <BenefitItem key={index} benefit={benefit} />
+                                    ))}
+                                </div>
+                            </div>
+                        </AnimatedSection>
+                    </div>
+                </section>
+            );
+        };
+
+        // Stats Section
+        const Stats = () => {
+            const containerStyle = {
+                padding: '80px 5%',
+                background: 'linear-gradient(135deg, #056CF2, #0597F2)'
+            };
+
+            const contentStyle = {
+                maxWidth: '1000px',
+                margin: '0 auto',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '2rem',
+                textAlign: 'center'
+            };
+
+            const stats = [
+                { number: '50+', label: 'Proyectos entregados' },
+                { number: '30+', label: 'Clientes satisfechos' },
+                { number: '8+', label: 'Años de experiencia' },
+                { number: '24/7', label: 'Soporte disponible' }
+            ];
+
+            const StatItem = ({ stat, index }) => {
+                const itemStyle = {
+                    color: 'white'
+                };
+
+                const numberStyle = {
+                    fontSize: '3rem',
+                    fontWeight: '900',
+                    marginBottom: '0.5rem'
+                };
+
+                const statLabelStyle = {
+                    fontSize: '0.95rem',
+                    fontWeight: '600',
+                    opacity: 0.9
+                };
+
+                return (
+                    <AnimatedSection delay={index * 0.1}>
+                        <div style={itemStyle}>
+                            <div style={numberStyle}>{stat.number}</div>
+                            <div style={statLabelStyle}>{stat.label}</div>
+                        </div>
+                    </AnimatedSection>
+                );
+            };
+
+            return (
+                <section style={containerStyle}>
+                    <div style={contentStyle}>
+                        {stats.map((stat, index) => (
+                            <StatItem key={index} stat={stat} index={index} />
+                        ))}
+                    </div>
+                </section>
+            );
+        };
+
+        // CTA Section
+        const CTA = () => {
+            const containerStyle = {
+                padding: '100px 5%',
+                background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)'
+            };
+
+            const contentStyle = {
+                maxWidth: '800px',
+                margin: '0 auto',
+                textAlign: 'center'
+            };
+
+            const titleStyle = {
+                fontSize: '2.8rem',
+                fontWeight: '800',
+                color: '#0f172a',
+                marginBottom: '1rem',
+                lineHeight: '1.2'
+            };
+
+            const highlightStyle = {
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+            };
+
+            const descStyle = {
+                fontSize: '1.15rem',
+                color: '#64748b',
+                marginBottom: '2.5rem',
+                lineHeight: '1.7'
+            };
+
+            const buttonStyle = {
+                padding: '1.25rem 3rem',
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50px',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: '700',
+                fontSize: '1.1rem',
+                cursor: 'pointer',
+                boxShadow: '0 15px 40px rgba(5, 151, 242, 0.35)',
+                transition: 'all 0.3s ease'
+            };
+
+            return (
+                <section style={containerStyle}>
+                    <AnimatedSection>
+                        <div style={contentStyle}>
+                            <h2 style={titleStyle}>
+                                ¿Listo para <span style={highlightStyle}>digitalizar</span> tu negocio?
+                            </h2>
+                            <p style={descStyle}>
+                                Agenda una llamada gratuita y cuéntanos tu idea. 
+                                Te asesoramos sin compromiso y te damos un presupuesto claro.
+                            </p>
+                            <button style={buttonStyle}>Agendar Llamada Gratis</button>
+                        </div>
+                    </AnimatedSection>
+                </section>
+            );
+        };
+
+        // Contact Section
+        const Contact = () => {
+            const containerStyle = {
+                padding: '100px 5%',
+                background: 'white'
+            };
+
+            const contentStyle = {
+                maxWidth: '1200px',
+                margin: '0 auto',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '4rem'
+            };
+
+            const infoStyle = {
+                padding: '2rem 0'
+            };
+
+            const labelStyle = {
+                display: 'inline-block',
+                padding: '0.5rem 1rem',
+                background: 'rgba(5, 151, 242, 0.1)',
+                borderRadius: '50px',
+                fontSize: '0.85rem',
+                fontWeight: '700',
+                color: '#0597F2',
+                marginBottom: '1rem'
+            };
+
+            const titleStyle = {
+                fontSize: '2.5rem',
+                fontWeight: '800',
+                color: '#0f172a',
+                marginBottom: '1.5rem'
+            };
+
+            const descStyle = {
+                color: '#64748b',
+                lineHeight: '1.8',
+                marginBottom: '2.5rem'
+            };
+
+            const contactItemsStyle = {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5rem'
+            };
+
+            const contactItems = [
+                { icon: '📧', label: 'Email', value: 'brayan.correa1411@gmail.com', link: 'mailto:brayan.correa1411@gmail.com' },
+                { icon: '📱', label: 'WhatsApp', value: '+57 322 7446219', link: 'https://wa.me/573227446219' }
+            ];
+
+            const ContactItem = ({ item }) => {
+                const itemStyle = {
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem'
+                };
+
+                const iconStyle = {
+                    width: '55px',
+                    height: '55px',
+                    background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.1), rgba(5, 108, 242, 0.05))',
+                    borderRadius: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.5rem'
+                };
+
+                const textStyle = {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.25rem'
+                };
+
+                const itemLabelStyle = {
+                    fontSize: '0.85rem',
+                    color: '#94a3b8',
+                    fontWeight: '600'
+                };
+
+                const valueStyle = {
+                    color: '#0f172a',
+                    fontWeight: '700',
+                    fontSize: '1.05rem',
+                    textDecoration: 'none',
+                    transition: 'color 0.3s ease'
+                };
+
+                return (
+                    <div style={itemStyle}>
+                        <div style={iconStyle}>{item.icon}</div>
+                        <div style={textStyle}>
+                            <span style={itemLabelStyle}>{item.label}</span>
+                            <a href={item.link} style={valueStyle}>{item.value}</a>
+                        </div>
+                    </div>
+                );
+            };
+
+            const formStyle = {
+                background: '#f8fafc',
+                borderRadius: '24px',
+                padding: '3rem',
+                border: '1px solid #e2e8f0'
+            };
+
+            const formTitleStyle = {
+                fontSize: '1.5rem',
+                fontWeight: '800',
+                color: '#0f172a',
+                marginBottom: '2rem'
+            };
+
+            const inputGroupStyle = {
+                marginBottom: '1.25rem'
+            };
+
+            const inputLabelStyle = {
+                display: 'block',
+                marginBottom: '0.5rem',
+                fontWeight: '600',
+                color: '#475569',
+                fontSize: '0.9rem'
+            };
+
+            const inputStyle = {
+                width: '100%',
+                padding: '1rem 1.25rem',
+                border: '2px solid #e2e8f0',
+                borderRadius: '12px',
+                fontFamily: 'Nunito, sans-serif',
+                fontSize: '1rem',
+                transition: 'border-color 0.3s ease',
+                outline: 'none',
+                background: 'white'
+            };
+
+            const textareaStyle = {
+                ...inputStyle,
+                minHeight: '120px',
+                resize: 'vertical'
+            };
+
+            const submitStyle = {
+                width: '100%',
+                padding: '1rem',
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: '700',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                marginTop: '0.5rem',
+                boxShadow: '0 10px 25px rgba(5, 151, 242, 0.25)',
+                transition: 'all 0.3s ease'
+            };
+
+            return (
+                <section id="contacto" style={containerStyle}>
+                    <div style={contentStyle}>
+                        <AnimatedSection>
+                            <div style={infoStyle}>
+                                <span style={labelStyle}>Contacto</span>
+                                <h2 style={titleStyle}>Hablemos de tu proyecto</h2>
+                                <p style={descStyle}>
+                                    Estamos listos para escucharte. Cuéntanos tu idea y te responderemos 
+                                    en menos de 24 horas con una propuesta personalizada.
+                                </p>
+                                <div style={contactItemsStyle}>
+                                    {contactItems.map((item, index) => (
+                                        <ContactItem key={index} item={item} />
+                                    ))}
+                                </div>
+                            </div>
+                        </AnimatedSection>
+                        
+                        <AnimatedSection delay={0.2}>
+                            <div style={formStyle}>
+                                <h3 style={formTitleStyle}>Envíanos un mensaje</h3>
+                                <form>
+                                    <div style={inputGroupStyle}>
+                                        <label style={inputLabelStyle}>Nombre completo</label>
+                                        <input type="text" style={inputStyle} placeholder="Tu nombre" />
+                                    </div>
+                                    <div style={inputGroupStyle}>
+                                        <label style={inputLabelStyle}>Email</label>
+                                        <input type="email" style={inputStyle} placeholder="tu@email.com" />
+                                    </div>
+                                    <div style={inputGroupStyle}>
+                                        <label style={inputLabelStyle}>Teléfono</label>
+                                        <input type="tel" style={inputStyle} placeholder="+57 300 000 0000" />
+                                    </div>
+                                    <div style={inputGroupStyle}>
+                                        <label style={inputLabelStyle}>Cuéntanos tu idea</label>
+                                        <textarea style={textareaStyle} placeholder="Describe brevemente lo que necesitas..."></textarea>
+                                    </div>
+                                    <button type="submit" style={submitStyle}>Enviar Mensaje</button>
+                                </form>
+                            </div>
+                        </AnimatedSection>
+                    </div>
+                </section>
+            );
+        };
+
+        // Footer
+        const Footer = () => {
+            const containerStyle = {
+                padding: '4rem 5% 2rem',
+                background: '#0f172a',
+                color: 'white'
+            };
+
+            const contentStyle = {
+                maxWidth: '1200px',
+                margin: '0 auto'
+            };
+
+            const topStyle = {
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1fr 1fr',
+                gap: '3rem',
+                marginBottom: '3rem',
+                paddingBottom: '3rem',
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
+            };
+
+            const brandStyle = {
+                maxWidth: '300px'
+            };
+
+            const logoStyle = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                marginBottom: '1rem'
+            };
+
+            const logoIconStyle = {
+                width: '40px',
+                height: '40px',
+                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: '800'
+            };
+
+            const logoTextStyle = {
+                fontSize: '1.4rem',
+                fontWeight: '800'
+            };
+
+            const brandDescStyle = {
+                color: '#94a3b8',
+                lineHeight: '1.7',
+                fontSize: '0.9rem'
+            };
+
+            const columnTitleStyle = {
+                fontWeight: '700',
+                marginBottom: '1.25rem',
+                fontSize: '1rem'
+            };
+
+            const linkStyle = {
+                display: 'block',
+                color: '#94a3b8',
+                textDecoration: 'none',
+                marginBottom: '0.75rem',
+                fontSize: '0.9rem',
+                transition: 'color 0.3s ease'
+            };
+
+            const bottomStyle = {
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem'
+            };
+
+            const copyrightStyle = {
+                color: '#64748b',
+                fontSize: '0.85rem'
+            };
+
+            return (
+                <footer style={containerStyle}>
+                    <div style={contentStyle}>
+                        <div style={topStyle}>
+                            <div style={brandStyle}>
+                                <div style={logoStyle}>
+                                    <div style={logoIconStyle}>T</div>
+                                    <span style={logoTextStyle}>TeoTech</span>
+                                </div>
+                                <p style={brandDescStyle}>
+                                    Tecnología accesible para todos. Conectamos personas y negocios con 
+                                    las mejores soluciones digitales.
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <h4 style={columnTitleStyle}>Servicios</h4>
+                                <a href="#" style={linkStyle}>Desarrollo Web</a>
+                                <a href="#" style={linkStyle}>Apps Móviles</a>
+                                <a href="#" style={linkStyle}>Software a Medida</a>
+                                <a href="#" style={linkStyle}>Diseño UI/UX</a>
+                            </div>
+                            
+                            <div>
+                                <h4 style={columnTitleStyle}>Empresa</h4>
+                                <a href="#" style={linkStyle}>Sobre Nosotros</a>
+                                <a href="#" style={linkStyle}>Portafolio</a>
+                                <a href="#" style={linkStyle}>Blog</a>
+                                <a href="#" style={linkStyle}>Contacto</a>
+                            </div>
+                            
+                            <div>
+                                <h4 style={columnTitleStyle}>Contacto</h4>
+                                <a href="mailto:brayan.correa1411@gmail.com" style={linkStyle}>brayan.correa1411@gmail.com</a>
+                                <a href="https://wa.me/573227446219" style={linkStyle}>+57 322 7446219</a>
+                            </div>
+                        </div>
+                        
+                        <div style={bottomStyle}>
+                            <p style={copyrightStyle}>© 2025 TeoTech. Todos los derechos reservados.</p>
+                            <p style={copyrightStyle}>Hecho con 💙 en Colombia</p>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        // Main App
+        const App = () => {
+            return (
+                <>
+                    <Navigation />
+                    <Hero />
+                    <TrustedBy />
+                    <Services />
+                    <HowItWorks />
+                    <Benefits />
+                    <Stats />
+                    <CTA />
+                    <Contact />
+                    <Footer />
+                </>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
