@@ -6,1579 +6,773 @@
     <title>TaoTech | Tecnología Accesible para Todos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         :root {
-            --blue-dark: #056CF2;
-            --blue-primary: #0583F2;
-            --blue-light: #66B1F2;
-            --blue-pale: #B3D5F2;
-            --blue-bright: #0597F2;
-            --white: #ffffff;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-600: #475569;
-            --gray-800: #1e293b;
-            --gray-900: #0f172a;
+            --bg:         #f4ede0;
+            --bg-soft:    #ebe0cc;
+            --ink:        #1f1a14;
+            --ink-soft:   #5c5346;
+            --accent:     #b14a2c;
+            --accent-deep:#8a3820;
+            --gold:       #c39a4a;
+            --line:       #d6c8af;
+            --white:      #fffcf5;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--white);
-            color: var(--gray-800);
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Outfit', sans-serif;
-        }
-
-        #root {
-            min-height: 100vh;
-        }
-
-        /* Mobile Menu Styles */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink); overflow-x:hidden; }
+        h1,h2,h3,h4,h5,h6 { font-family:'Outfit',sans-serif; }
+        #root { min-height:100vh; }
         .mobile-menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 999;
+            position:fixed; top:0; left:0; right:0; bottom:0;
+            background:rgba(31,26,20,0.96); backdrop-filter:blur(10px);
+            z-index:999; display:flex; flex-direction:column; align-items:center;
+            justify-content:center; gap:2rem; animation:fadeIn 0.3s ease;
+        }
+        .mobile-menu-overlay a { color:var(--bg); text-decoration:none; font-size:1.5rem; font-weight:600; font-family:'Outfit',sans-serif; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+
+        /* ── Service cards: equal height grid ── */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(1rem, 2vw, 1.5rem);
+            align-items: stretch;
+        }
+        @media (max-width: 900px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 560px) {
+            .services-grid { grid-template-columns: 1fr; }
+        }
+        .service-card {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2rem;
-            animation: fadeIn 0.3s ease;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: clamp(1.5rem, 3vw, 2.2rem);
+            transition: all 0.35s ease;
+            cursor: pointer;
+            height: 100%;
         }
-
-        .mobile-menu-overlay a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
+        .service-card:hover {
+            background: var(--white);
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(177,74,44,0.1);
+        }
+        .service-card .icon-wrap {
+            width: 58px; height: 58px;
+            background: rgba(177,74,44,0.1);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+            transition: background 0.35s ease;
+            flex-shrink: 0;
+            /* FIX: use an img inside or just keep the emoji – no filter on hover */
+        }
+        .service-card:hover .icon-wrap {
+            background: rgba(177,74,44,0.18);
+            /* ✅ NO filter here — emoji stays visible */
+        }
+        .service-card h3 {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 0.6rem;
+        }
+        .service-card p {
+            color: var(--ink-soft);
+            line-height: 1.7;
+            font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+            flex: 1; /* pushes tags to bottom */
+            margin-bottom: 1.25rem;
+        }
+        .service-card .tags {
+            display: flex; gap: 0.45rem; flex-wrap: wrap;
+            margin-top: auto;
+        }
+        .service-card .tag {
+            padding: 0.3rem 0.7rem;
+            background: rgba(177,74,44,0.08);
+            border-radius: 4px;
+            font-size: clamp(0.7rem, 1.4vw, 0.78rem);
             font-weight: 600;
-            font-family: 'Outfit', sans-serif;
+            color: var(--accent-deep);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        /* ── Form toast ── */
+        .toast {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+            padding: 1rem 1.5rem; border-radius: 8px;
+            font-family: 'Outfit', sans-serif; font-weight: 600;
+            font-size: 0.95rem; color: #fff;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
         }
+        .toast.success { background: #2d6a4f; }
+        .toast.error   { background: #b14a2c; }
+        @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-
-        /* Responsive breakpoints */
-        @media (max-width: 1024px) {
-            .desktop-nav { display: none !important; }
-            .mobile-menu-btn { display: flex !important; }
-        }
-
-        @media (min-width: 1025px) {
-            .desktop-nav { display: flex !important; }
-            .mobile-menu-btn { display: none !important; }
-        }
+        @media (max-width:1024px) { .desktop-nav{display:none!important} .mobile-menu-btn{display:flex!important} }
+        @media (min-width:1025px) { .desktop-nav{display:flex!important} .mobile-menu-btn{display:none!important} }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+const useScrollAnimation = (threshold=0.1) => {
+    const ref = useRef(null);
+    const [isVisible,setIsVisible] = useState(false);
+    useEffect(()=>{
+        const observer = new IntersectionObserver(
+            ([entry])=>{ if(entry.isIntersecting) setIsVisible(true); },
+            {threshold, rootMargin:'0px 0px -50px 0px'}
+        );
+        if(ref.current) observer.observe(ref.current);
+        return ()=>observer.disconnect();
+    },[threshold]);
+    return [ref,isVisible];
+};
 
-        // Hook for scroll animations
-        const useScrollAnimation = (threshold = 0.1) => {
-            const ref = useRef(null);
-            const [isVisible, setIsVisible] = useState(false);
+const AnimatedSection = ({children,delay=0,className=''}) => {
+    const [ref,isVisible] = useScrollAnimation();
+    return (
+        <div ref={ref} className={className} style={{
+            opacity:isVisible?1:0,
+            transform:isVisible?'translateY(0)':'translateY(40px)',
+            transition:`all 0.7s cubic-bezier(0.4,0,0.2,1) ${delay}s`
+        }}>{children}</div>
+    );
+};
 
-            useEffect(() => {
-                const observer = new IntersectionObserver(
-                    ([entry]) => {
-                        if (entry.isIntersecting) {
-                            setIsVisible(true);
-                        }
-                    },
-                    { threshold, rootMargin: '0px 0px -50px 0px' }
-                );
+const TaoLogo = ({size=45, dark=false}) => {
+    const bg     = dark ? '#1f1a14' : '#f4ede0';
+    const ring   = dark ? '#f4ede0' : '#1f1a14';
+    const kanji  = dark ? '#f4ede0' : '#1f1a14';
+    return (
+        <svg width={size} height={size} viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill={bg} stroke={ring} strokeWidth="3"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#b14a2c" strokeWidth="1.2" strokeDasharray="5 3"/>
+            <text x="50" y="67" fontFamily="Georgia,'Times New Roman',serif"
+                fontSize="52" fontWeight="700" fill={kanji} textAnchor="middle">道</text>
+            <rect x="82" y="10" width="6" height="6" fill="#b14a2c"/>
+            <rect x="89" y="5"  width="4" height="4" fill="#c39a4a"/>
+            <rect x="94" y="1"  width="2" height="2" fill="#c39a4a"/>
+        </svg>
+    );
+};
 
-                if (ref.current) {
-                    observer.observe(ref.current);
-                }
+const Navigation = () => {
+    const [scrolled,setScrolled] = useState(false);
+    const [mobileOpen,setMobileOpen] = useState(false);
+    useEffect(()=>{
+        const h=()=>setScrolled(window.scrollY>50);
+        window.addEventListener('scroll',h);
+        return ()=>window.removeEventListener('scroll',h);
+    },[]);
+    const nav={position:'fixed',top:0,width:'100%',padding:scrolled?'0.75rem 5%':'1rem 5%',
+        display:'flex',justifyContent:'space-between',alignItems:'center',zIndex:1000,
+        background:scrolled?'rgba(244,237,224,0.97)':'transparent',
+        backdropFilter:scrolled?'blur(20px)':'none',
+        boxShadow:scrolled?'0 4px 30px rgba(177,74,44,0.08)':'none',
+        borderBottom:scrolled?'1px solid #d6c8af':'none',transition:'all 0.3s ease'};
+    const cta={padding:'0.7rem 1.4rem',background:'#1f1a14',color:'#f4ede0',border:'none',
+        borderRadius:'4px',fontFamily:'Outfit,sans-serif',fontWeight:'600',fontSize:'0.9rem',cursor:'pointer'};
+    const burger={width:'40px',height:'40px',background:'#1f1a14',border:'none',borderRadius:'6px',
+        cursor:'pointer',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'5px',padding:'10px'};
+    return (
+        <>
+        <nav style={nav}>
+            <a href="#" style={{display:'flex',alignItems:'center',gap:'0.6rem',textDecoration:'none'}}>
+                <TaoLogo size={40}/>
+                <span style={{fontSize:'clamp(1.3rem,4vw,1.6rem)',fontWeight:'800',fontFamily:'Outfit,sans-serif',color:'#1f1a14'}}>
+                    Tao<span style={{color:'#b14a2c'}}>Tech</span>
+                </span>
+            </a>
+            <ul style={{display:'flex',gap:'clamp(1rem,3vw,2.5rem)',listStyle:'none',alignItems:'center'}} className="desktop-nav">
+                <li><a href="#servicios"     style={{color:'#5c5346',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Servicios</a></li>
+                <li><a href="#como-funciona" style={{color:'#5c5346',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Proceso</a></li>
+                <li><a href="#beneficios"    style={{color:'#5c5346',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Beneficios</a></li>
+                <li><a href="#contacto"      style={{color:'#5c5346',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Contacto</a></li>
+                <li><button style={cta} onClick={()=>document.getElementById('contacto').scrollIntoView({behavior:'smooth'})}>Comenzar</button></li>
+            </ul>
+            <button style={burger} className="mobile-menu-btn" onClick={()=>setMobileOpen(true)}>
+                <span style={{width:'20px',height:'2px',background:'#f4ede0',borderRadius:'2px'}}/>
+                <span style={{width:'20px',height:'2px',background:'#f4ede0',borderRadius:'2px'}}/>
+                <span style={{width:'20px',height:'2px',background:'#f4ede0',borderRadius:'2px'}}/>
+            </button>
+        </nav>
+        {mobileOpen && (
+            <div className="mobile-menu-overlay" onClick={()=>setMobileOpen(false)}>
+                <button onClick={()=>setMobileOpen(false)} style={{position:'absolute',top:'1.5rem',right:'5%',background:'transparent',border:'none',color:'#f4ede0',fontSize:'2rem',cursor:'pointer'}}>✕</button>
+                <a href="#servicios"     onClick={()=>setMobileOpen(false)}>Servicios</a>
+                <a href="#como-funciona" onClick={()=>setMobileOpen(false)}>Proceso</a>
+                <a href="#beneficios"    onClick={()=>setMobileOpen(false)}>Beneficios</a>
+                <a href="#contacto"      onClick={()=>setMobileOpen(false)}>Contacto</a>
+                <button style={{padding:'1rem 2rem',background:'#1f1a14',color:'#f4ede0',border:'none',borderRadius:'4px',fontFamily:'Outfit,sans-serif',fontWeight:'700',fontSize:'1rem',cursor:'pointer',marginTop:'1rem'}}>Comenzar</button>
+            </div>
+        )}
+        </>
+    );
+};
 
-                return () => observer.disconnect();
-            }, [threshold]);
-
-            return [ref, isVisible];
-        };
-
-        // Animated component wrapper
-        const AnimatedSection = ({ children, delay = 0, className = '' }) => {
-            const [ref, isVisible] = useScrollAnimation();
-            
-            return (
-                <div
-                    ref={ref}
-                    className={className}
-                    style={{
-                        opacity: isVisible ? 1 : 0,
-                        transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
-                        transition: `all 0.7s cubic-bezier(0.4, 0, 0.2, 1) ${delay}s`
-                    }}
-                >
-                    {children}
-                </div>
-            );
-        };
-
-        // Yin Yang Logo Component
-        const TaoLogo = ({ size = 45 }) => {
-            return (
-                <svg width={size} height={size} viewBox="0 0 100 100" style={{ filter: 'drop-shadow(0 4px 6px rgba(5, 151, 242, 0.3))' }}>
-                    <defs>
-                        <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#0597F2" />
-                            <stop offset="100%" stopColor="#056CF2" />
-                        </linearGradient>
-                    </defs>
-                    <circle cx="50" cy="50" r="48" fill="url(#blueGrad)" />
-                    <path d="M50 2 A48 48 0 0 1 50 98 A24 24 0 0 1 50 50 A24 24 0 0 0 50 2" fill="white" />
-                    <circle cx="50" cy="26" r="8" fill="url(#blueGrad)" />
-                    <circle cx="50" cy="74" r="8" fill="white" />
-                </svg>
-            );
-        };
-
-        // Navigation Component
-        const Navigation = () => {
-            const [scrolled, setScrolled] = useState(false);
-            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-            useEffect(() => {
-                const handleScroll = () => {
-                    setScrolled(window.scrollY > 50);
-                };
-                window.addEventListener('scroll', handleScroll);
-                return () => window.removeEventListener('scroll', handleScroll);
-            }, []);
-
-            const closeMobileMenu = () => setMobileMenuOpen(false);
-
-            const navStyle = {
-                position: 'fixed',
-                top: 0,
-                width: '100%',
-                padding: scrolled ? '0.75rem 5%' : '1rem 5%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                zIndex: 1000,
-                background: scrolled ? 'rgba(255, 255, 255, 0.98)' : 'transparent',
-                backdropFilter: scrolled ? 'blur(20px)' : 'none',
-                boxShadow: scrolled ? '0 4px 30px rgba(5, 108, 242, 0.08)' : 'none',
-                transition: 'all 0.3s ease'
-            };
-
-            const logoStyle = {
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.6rem',
-                textDecoration: 'none'
-            };
-
-            const logoTextStyle = {
-                fontSize: 'clamp(1.3rem, 4vw, 1.6rem)',
-                fontWeight: '800',
-                fontFamily: 'Outfit, sans-serif',
-                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-            };
-
-            const navLinksStyle = {
-                display: 'flex',
-                gap: 'clamp(1rem, 3vw, 2.5rem)',
-                listStyle: 'none',
-                alignItems: 'center'
-            };
-
-            const linkStyle = {
-                color: '#475569',
-                textDecoration: 'none',
-                fontWeight: '600',
-                fontSize: '0.95rem',
-                transition: 'color 0.3s ease',
-                cursor: 'pointer'
-            };
-
-            const ctaButtonStyle = {
-                padding: '0.7rem 1.4rem',
-                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '50px',
-                fontFamily: 'Outfit, sans-serif',
-                fontWeight: '600',
-                fontSize: '0.9rem',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 15px rgba(5, 151, 242, 0.3)'
-            };
-
-            const hamburgerStyle = {
-                width: '40px',
-                height: '40px',
-                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
-                border: 'none',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '5px',
-                padding: '10px'
-            };
-
-            const lineStyle = {
-                width: '20px',
-                height: '2px',
-                background: 'white',
-                borderRadius: '2px',
-                transition: 'all 0.3s ease'
-            };
-
-            return (
-                <>
-                    <nav style={navStyle}>
-                        <a href="#" style={logoStyle}>
-                            <TaoLogo size={40} />
-                            <span style={logoTextStyle}>TaoTech</span>
-                        </a>
-                        
-                        <ul style={navLinksStyle} className="desktop-nav">
-                            <li><a href="#servicios" style={linkStyle}>Servicios</a></li>
-                            <li><a href="#como-funciona" style={linkStyle}>Proceso</a></li>
-                            <li><a href="#beneficios" style={linkStyle}>Beneficios</a></li>
-                            <li><a href="#contacto" style={linkStyle}>Contacto</a></li>
-                            <li>
-                                <button style={ctaButtonStyle}>Comenzar</button>
-                            </li>
-                        </ul>
-
-                        <button 
-                            style={hamburgerStyle} 
-                            className="mobile-menu-btn"
-                            onClick={() => setMobileMenuOpen(true)}
-                        >
-                            <span style={lineStyle}></span>
-                            <span style={lineStyle}></span>
-                            <span style={lineStyle}></span>
+const Hero = () => (
+    <section style={{minHeight:'100vh',display:'flex',alignItems:'center',
+        padding:'clamp(100px,15vh,140px) 5% clamp(60px,10vh,100px)',
+        background:'#f4ede0',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',top:'-20%',right:'-10%',width:'60%',height:'140%',
+            background:'radial-gradient(ellipse at center,rgba(177,74,44,0.07) 0%,transparent 70%)',pointerEvents:'none'}}/>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,450px),1fr))',
+            gap:'clamp(2rem,5vw,4rem)',alignItems:'center',maxWidth:'1400px',margin:'0 auto',width:'100%'}}>
+            <AnimatedSection>
+                <div style={{maxWidth:'600px'}}>
+                    <div style={{display:'inline-flex',alignItems:'center',gap:'0.5rem',
+                        padding:'0.5rem 1rem',background:'rgba(177,74,44,0.1)',
+                        border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
+                        fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'600',color:'#b14a2c',marginBottom:'1.5rem'}}>
+                        <span>☯</span><span>El equilibrio perfecto</span>
+                    </div>
+                    <h1 style={{fontSize:'clamp(2rem,6vw,3.5rem)',fontWeight:'900',lineHeight:'1.15',
+                        color:'#1f1a14',marginBottom:'1.5rem'}}>
+                        Impulsa tu negocio con{' '}
+                        <span style={{color:'#b14a2c'}}>tecnología accesible</span>
+                    </h1>
+                    <p style={{fontSize:'clamp(1rem,2.5vw,1.2rem)',color:'#5c5346',lineHeight:'1.8',marginBottom:'2rem'}}>
+                        Conectamos personas y negocios con programadores profesionales.
+                        Desarrollo web, apps y soluciones digitales a medida, de forma sencilla y al alcance de todos.
+                    </p>
+                    <div style={{display:'flex',gap:'1rem',flexWrap:'wrap'}}>
+                        <button onClick={()=>document.getElementById('contacto').scrollIntoView({behavior:'smooth'})}
+                            style={{padding:'clamp(0.8rem,2vw,1rem) clamp(1.5rem,4vw,2.5rem)',
+                            background:'#1f1a14',color:'#f4ede0',border:'none',borderRadius:'4px',
+                            fontFamily:'Outfit,sans-serif',fontWeight:'700',fontSize:'clamp(0.9rem,2vw,1rem)',cursor:'pointer'}}>
+                            Solicitar Cotización
                         </button>
-                    </nav>
-
-                    {mobileMenuOpen && (
-                        <div className="mobile-menu-overlay" onClick={closeMobileMenu}>
-                            <button 
-                                onClick={closeMobileMenu}
-                                style={{
-                                    position: 'absolute',
-                                    top: '1.5rem',
-                                    right: '5%',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: 'white',
-                                    fontSize: '2rem',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                ✕
-                            </button>
-                            <a href="#servicios" onClick={closeMobileMenu}>Servicios</a>
-                            <a href="#como-funciona" onClick={closeMobileMenu}>Proceso</a>
-                            <a href="#beneficios" onClick={closeMobileMenu}>Beneficios</a>
-                            <a href="#contacto" onClick={closeMobileMenu}>Contacto</a>
-                            <button style={{...ctaButtonStyle, marginTop: '1rem', padding: '1rem 2rem', fontSize: '1rem'}}>
-                                Comenzar
-                            </button>
-                        </div>
-                    )}
-                </>
-            );
-        };
-
-        // Hero Section
-        const Hero = () => {
-            const containerStyle = {
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                padding: 'clamp(100px, 15vh, 140px) 5% clamp(60px, 10vh, 100px)',
-                background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)',
-                position: 'relative',
-                overflow: 'hidden'
-            };
-
-            const bgDecorStyle = {
-                position: 'absolute',
-                top: '-20%',
-                right: '-10%',
-                width: '60%',
-                height: '140%',
-                background: 'radial-gradient(ellipse at center, rgba(5, 151, 242, 0.08) 0%, transparent 70%)',
-                pointerEvents: 'none'
-            };
-
-            const contentStyle = {
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 450px), 1fr))',
-                gap: 'clamp(2rem, 5vw, 4rem)',
-                alignItems: 'center',
-                maxWidth: '1400px',
-                margin: '0 auto',
-                width: '100%'
-            };
-
-            const textContentStyle = {
-                maxWidth: '600px'
-            };
-
-            const badgeStyle = {
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 1rem',
-                background: 'rgba(5, 151, 242, 0.1)',
-                border: '1px solid rgba(5, 151, 242, 0.2)',
-                borderRadius: '50px',
-                fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
-                fontWeight: '600',
-                color: '#0597F2',
-                marginBottom: '1.5rem'
-            };
-
-            const headingStyle = {
-                fontSize: 'clamp(2rem, 6vw, 3.5rem)',
-                fontWeight: '900',
-                lineHeight: '1.15',
-                color: '#0f172a',
-                marginBottom: '1.5rem',
-                fontFamily: 'Outfit, sans-serif'
-            };
-
-            const highlightStyle = {
-                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-            };
-
-            const descriptionStyle = {
-                fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-                color: '#475569',
-                lineHeight: '1.8',
-                marginBottom: '2rem'
-            };
-
-            const buttonsStyle = {
-                display: 'flex',
-                gap: '1rem',
-                flexWrap: 'wrap'
-            };
-
-            const primaryBtnStyle = {
-                padding: 'clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2.5rem)',
-                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '50px',
-                fontFamily: 'Outfit, sans-serif',
-                fontWeight: '700',
-                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-                cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(5, 151, 242, 0.3)',
-                transition: 'all 0.3s ease'
-            };
-
-            const secondaryBtnStyle = {
-                padding: 'clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2.5rem)',
-                background: 'transparent',
-                color: '#0597F2',
-                border: '2px solid #0597F2',
-                borderRadius: '50px',
-                fontFamily: 'Outfit, sans-serif',
-                fontWeight: '700',
-                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-            };
-
-            const imageContainerStyle = {
-                position: 'relative',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            };
-
-            const imageBoxStyle = {
-                width: '100%',
-                maxWidth: '500px',
-                aspectRatio: '4/3',
-                background: 'linear-gradient(145deg, #f1f5f9, #e2e8f0)',
-                borderRadius: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 25px 50px rgba(5, 108, 242, 0.15)'
-            };
-
-            const placeholderStyle = {
-                color: '#94a3b8',
-                fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                fontWeight: '600',
-                textAlign: 'center',
-                padding: '2rem'
-            };
-
-            const floatingCard1 = {
-                position: 'absolute',
-                top: '-10px',
-                right: '-10px',
-                background: 'white',
-                padding: 'clamp(0.6rem, 2vw, 1rem) clamp(0.8rem, 2vw, 1.5rem)',
-                borderRadius: '16px',
-                boxShadow: '0 15px 40px rgba(5, 108, 242, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.6rem',
-                animation: 'float 4s ease-in-out infinite'
-            };
-
-            const floatingCard2 = {
-                position: 'absolute',
-                bottom: '10px',
-                left: '-10px',
-                background: 'white',
-                padding: 'clamp(0.6rem, 2vw, 1rem) clamp(0.8rem, 2vw, 1.5rem)',
-                borderRadius: '16px',
-                boxShadow: '0 15px 40px rgba(5, 108, 242, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.6rem',
-                animation: 'float 5s ease-in-out infinite reverse'
-            };
-
-            const iconCircleStyle = {
-                width: 'clamp(32px, 5vw, 40px)',
-                height: 'clamp(32px, 5vw, 40px)',
-                background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.15), rgba(5, 108, 242, 0.1))',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#0597F2',
-                fontSize: 'clamp(1rem, 2vw, 1.2rem)'
-            };
-
-            return (
-                <section style={containerStyle}>
-                    <div style={bgDecorStyle}></div>
-                    <div style={contentStyle}>
-                        <AnimatedSection>
-                            <div style={textContentStyle}>
-                                <div style={badgeStyle}>
-                                    <span>☯</span>
-                                    <span>El equilibrio perfecto</span>
-                                </div>
-                                <h1 style={headingStyle}>
-                                    Impulsa tu negocio con <span style={highlightStyle}>tecnología accesible</span>
-                                </h1>
-                                <p style={descriptionStyle}>
-                                    Conectamos personas y negocios con programadores profesionales. 
-                                    Desarrollo web, apps y soluciones digitales a medida, de forma sencilla y al alcance de todos.
-                                </p>
-                                <div style={buttonsStyle}>
-                                    <button style={primaryBtnStyle}>Solicitar Cotización</button>
-                                    <button style={secondaryBtnStyle}>Ver Servicios</button>
-                                </div>
-                            </div>
-                        </AnimatedSection>
-                        
-                        <AnimatedSection delay={0.2}>
-                            <div style={imageContainerStyle}>
-                                <div style={imageBoxStyle}>
-                                    <p style={placeholderStyle}>
-                                        📷 Espacio para imagen hero<br/>
-                                        <small>(Dashboard o equipo trabajando)</small>
-                                    </p>
-                                </div>
-                                <div style={floatingCard1}>
-                                    <div style={iconCircleStyle}>💻</div>
-                                    <div>
-                                        <div style={{fontWeight: '700', color: '#0f172a', fontSize: 'clamp(0.75rem, 2vw, 0.9rem)'}}>+50 Proyectos</div>
-                                        <div style={{fontSize: 'clamp(0.65rem, 1.5vw, 0.8rem)', color: '#64748b'}}>Completados</div>
-                                    </div>
-                                </div>
-                                <div style={floatingCard2}>
-                                    <div style={iconCircleStyle}>⭐</div>
-                                    <div>
-                                        <div style={{fontWeight: '700', color: '#0f172a', fontSize: 'clamp(0.75rem, 2vw, 0.9rem)'}}>100% Satisfacción</div>
-                                        <div style={{fontSize: 'clamp(0.65rem, 1.5vw, 0.8rem)', color: '#64748b'}}>Garantizada</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </AnimatedSection>
+                        <button onClick={()=>document.getElementById('servicios').scrollIntoView({behavior:'smooth'})}
+                            style={{padding:'clamp(0.8rem,2vw,1rem) clamp(1.5rem,4vw,2.5rem)',
+                            background:'transparent',color:'#b14a2c',border:'2px solid #b14a2c',borderRadius:'4px',
+                            fontFamily:'Outfit,sans-serif',fontWeight:'700',fontSize:'clamp(0.9rem,2vw,1rem)',cursor:'pointer'}}>
+                            Ver Servicios
+                        </button>
                     </div>
-                </section>
-            );
-        };
+                </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.2}>
+                <div style={{position:'relative',display:'flex',justifyContent:'center',alignItems:'center'}}>
+                    <div style={{width:'100%',maxWidth:'500px',aspectRatio:'4/3',background:'#ebe0cc',
+                        borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',
+                        border:'1px solid #d6c8af',overflow:'hidden'}}>
+                        <p style={{color:'#5c5346',fontSize:'clamp(0.8rem,2vw,1rem)',fontWeight:'600',textAlign:'center',padding:'2rem'}}>
+                            📷 Espacio para imagen hero<br/><small>(Dashboard o equipo trabajando)</small>
+                        </p>
+                    </div>
+                    <div style={{position:'absolute',top:'-10px',right:'-10px',background:'#fffcf5',
+                        padding:'clamp(0.6rem,2vw,1rem) clamp(0.8rem,2vw,1.5rem)',borderRadius:'8px',
+                        border:'1px solid #d6c8af',display:'flex',alignItems:'center',gap:'0.6rem',animation:'float 4s ease-in-out infinite'}}>
+                        <div style={{width:'36px',height:'36px',background:'rgba(177,74,44,0.12)',borderRadius:'50%',
+                            display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem'}}>💻</div>
+                        <div>
+                            <div style={{fontWeight:'700',color:'#1f1a14',fontSize:'0.85rem'}}>+20 Proyectos</div>
+                            <div style={{fontSize:'0.75rem',color:'#5c5346'}}>Completados</div>
+                        </div>
+                    </div>
+                    <div style={{position:'absolute',bottom:'10px',left:'-10px',background:'#fffcf5',
+                        padding:'clamp(0.6rem,2vw,1rem) clamp(0.8rem,2vw,1.5rem)',borderRadius:'8px',
+                        border:'1px solid #d6c8af',display:'flex',alignItems:'center',gap:'0.6rem',animation:'float 5s ease-in-out infinite reverse'}}>
+                        <div style={{width:'36px',height:'36px',background:'rgba(195,154,74,0.15)',borderRadius:'50%',
+                            display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem'}}>⭐</div>
+                        <div>
+                            <div style={{fontWeight:'700',color:'#1f1a14',fontSize:'0.85rem'}}>100% Satisfacción</div>
+                            <div style={{fontSize:'0.75rem',color:'#5c5346'}}>Garantizada</div>
+                        </div>
+                    </div>
+                </div>
+            </AnimatedSection>
+        </div>
+    </section>
+);
 
-        // Trusted By Section
-        const TrustedBy = () => {
-            const containerStyle = {
-                padding: 'clamp(2rem, 5vw, 4rem) 5%',
-                background: 'white',
-                borderTop: '1px solid #e2e8f0',
-                borderBottom: '1px solid #e2e8f0'
-            };
+const TrustedBy = () => (
+    <section style={{padding:'clamp(2rem,5vw,4rem) 5%',background:'#ebe0cc',borderTop:'1px solid #d6c8af',borderBottom:'1px solid #d6c8af'}}>
+        <AnimatedSection>
+            <div style={{maxWidth:'1200px',margin:'0 auto',textAlign:'center'}}>
+                <p style={{fontSize:'clamp(0.75rem,2vw,0.9rem)',fontWeight:'600',color:'#5c5346',
+                    textTransform:'uppercase',letterSpacing:'3px',marginBottom:'clamp(1rem,3vw,2rem)',
+                    fontFamily:'JetBrains Mono,monospace'}}>Confían en nosotros</p>
+                <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:'clamp(1.5rem,4vw,4rem)',flexWrap:'wrap'}}>
+                    {[1,2,3,4,5].map(i=>(
+                        <div key={i} style={{width:'clamp(80px,15vw,120px)',height:'clamp(30px,5vw,40px)',
+                            background:'rgba(31,26,20,0.06)',border:'1px solid #d6c8af',borderRadius:'4px',
+                            display:'flex',alignItems:'center',justifyContent:'center',
+                            color:'#5c5346',fontSize:'clamp(0.6rem,1.5vw,0.75rem)',fontWeight:'600'}}>Logo {i}</div>
+                    ))}
+                </div>
+            </div>
+        </AnimatedSection>
+    </section>
+);
 
-            const contentStyle = {
-                maxWidth: '1200px',
-                margin: '0 auto',
-                textAlign: 'center'
-            };
+/* ══════════════════════════════════════════════
+   SERVICES — equal-height cards, icon fix
+══════════════════════════════════════════════ */
+const Services = () => {
+    const services = [
+        {icon:'🌐',title:'Desarrollo Web',description:'Sitios web modernos, rápidos y optimizados para convertir visitantes en clientes.',features:['Landing Pages','E-commerce','Portales Web']},
+        {icon:'📱',title:'Aplicaciones Móviles',description:'Apps nativas y multiplataforma que llevan tu negocio al bolsillo de tus clientes.',features:['iOS & Android','Apps Híbridas','PWA']},
+        {icon:'⚙️',title:'Software a Medida',description:'Sistemas personalizados que automatizan y optimizan los procesos de tu negocio.',features:['CRM','Inventarios','Gestión']},
+        {icon:'🎨',title:'Diseño UI/UX',description:'Interfaces atractivas y experiencias de usuario que enamoran a tus clientes.',features:['Prototipos','Branding','Diseño Web']},
+        {icon:'📊',title:'Consultoría Tech',description:'Te asesoramos para elegir las mejores soluciones tecnológicas para tu negocio.',features:['Análisis','Estrategia','Optimización']},
+        {icon:'🔧',title:'Mantenimiento',description:'Soporte continuo para que tus sistemas siempre funcionen al 100%.',features:['Actualizaciones','Soporte 24/7','Backups']}
+    ];
 
-            const titleStyle = {
-                fontSize: 'clamp(0.75rem, 2vw, 0.9rem)',
-                fontWeight: '600',
-                color: '#94a3b8',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                marginBottom: 'clamp(1rem, 3vw, 2rem)'
-            };
+    return (
+        <section id="servicios" style={{padding:'clamp(60px,10vw,100px) 5%',background:'#f4ede0'}}>
+            <div style={{maxWidth:'1140px',margin:'0 auto'}}>
+                <AnimatedSection>
+                    <div style={{textAlign:'center',marginBottom:'clamp(2rem,5vw,4rem)'}}>
+                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'rgba(177,74,44,0.1)',
+                            border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
+                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'#b14a2c',
+                            marginBottom:'1rem',fontFamily:'JetBrains Mono,monospace',letterSpacing:'2px'}}>NUESTROS SERVICIOS</span>
+                        <h2 style={{fontSize:'clamp(1.8rem,5vw,2.8rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1rem'}}>Soluciones para cada necesidad</h2>
+                        <p style={{fontSize:'clamp(0.9rem,2vw,1.1rem)',color:'#5c5346',maxWidth:'600px',margin:'0 auto',lineHeight:'1.7'}}>
+                            Ofrecemos un amplio catálogo de servicios tecnológicos adaptados al tamaño y presupuesto de tu negocio.
+                        </p>
+                    </div>
+                </AnimatedSection>
 
-            const logosStyle = {
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: 'clamp(1.5rem, 4vw, 4rem)',
-                flexWrap: 'wrap'
-            };
-
-            const logoPlaceholderStyle = {
-                width: 'clamp(80px, 15vw, 120px)',
-                height: 'clamp(30px, 5vw, 40px)',
-                background: '#f1f5f9',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#94a3b8',
-                fontSize: 'clamp(0.6rem, 1.5vw, 0.75rem)',
-                fontWeight: '600'
-            };
-
-            return (
-                <section style={containerStyle}>
-                    <AnimatedSection>
-                        <div style={contentStyle}>
-                            <p style={titleStyle}>Confían en nosotros</p>
-                            <div style={logosStyle}>
-                                <div style={logoPlaceholderStyle}>Logo 1</div>
-                                <div style={logoPlaceholderStyle}>Logo 2</div>
-                                <div style={logoPlaceholderStyle}>Logo 3</div>
-                                <div style={logoPlaceholderStyle}>Logo 4</div>
-                                <div style={logoPlaceholderStyle}>Logo 5</div>
+                {/* Grid with equal height */}
+                <div className="services-grid">
+                    {services.map((s,i)=>(
+                        <AnimatedSection key={i} delay={i*0.08} style={{height:'100%'}}>
+                            <div className="service-card">
+                                {/* ✅ FIX: icon-wrap solo cambia color de fondo, NO filter */}
+                                <div className="icon-wrap">{s.icon}</div>
+                                <h3>{s.title}</h3>
+                                <p>{s.description}</p>
+                                <div className="tags">
+                                    {s.features.map((f,j)=>(
+                                        <span key={j} className="tag">{f}</span>
+                                    ))}
+                                </div>
                             </div>
+                        </AnimatedSection>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+const HowItWorks = () => {
+    const steps = [
+        {number:'01',title:'Cuéntanos tu idea',description:'Describe lo que necesitas. Sin tecnicismos, en tus propias palabras.'},
+        {number:'02',title:'Recibe propuestas',description:'Te presentamos opciones claras con precios y tiempos definidos.'},
+        {number:'03',title:'Desarrollamos',description:'Nuestros expertos trabajan en tu proyecto con actualizaciones constantes.'},
+        {number:'04',title:'¡Listo para usar!',description:'Entregamos tu solución funcionando y te capacitamos para usarla.'}
+    ];
+    return (
+        <section id="como-funciona" style={{padding:'clamp(60px,10vw,100px) 5%',background:'#ebe0cc'}}>
+            <div style={{maxWidth:'1200px',margin:'0 auto'}}>
+                <AnimatedSection>
+                    <div style={{textAlign:'center',marginBottom:'clamp(2.5rem,6vw,5rem)'}}>
+                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'rgba(177,74,44,0.1)',
+                            border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
+                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'#b14a2c',
+                            marginBottom:'1rem',fontFamily:'JetBrains Mono,monospace',letterSpacing:'2px'}}>PROCESO SIMPLE</span>
+                        <h2 style={{fontSize:'clamp(1.8rem,5vw,2.8rem)',fontWeight:'800',color:'#1f1a14'}}>¿Cómo funciona?</h2>
+                    </div>
+                </AnimatedSection>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,240px),1fr))',gap:'clamp(1.5rem,3vw,2rem)'}}>
+                    {steps.map((s,i)=>(
+                        <AnimatedSection key={i} delay={i*0.15}>
+                            <div style={{textAlign:'center',padding:'clamp(1.5rem,3vw,2.5rem)',
+                                background:'#f4ede0',borderRadius:'8px',border:'1px solid #d6c8af',height:'100%'}}>
+                                <div style={{fontSize:'clamp(2.5rem,6vw,4rem)',fontWeight:'900',color:'#b14a2c',
+                                    marginBottom:'0.75rem',fontFamily:'JetBrains Mono,monospace',opacity:'0.4'}}>{s.number}</div>
+                                <h3 style={{fontSize:'clamp(1rem,2.5vw,1.2rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'0.75rem'}}>{s.title}</h3>
+                                <p style={{color:'#5c5346',lineHeight:'1.7',fontSize:'clamp(0.85rem,2vw,0.95rem)'}}>{s.description}</p>
+                            </div>
+                        </AnimatedSection>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+const Benefits = () => {
+    const benefits = [
+        {icon:'💰',title:'Precios accesibles',desc:'Soluciones ajustadas a tu presupuesto'},
+        {icon:'🎯',title:'Sin tecnicismos',desc:'Te explicamos todo de forma clara'},
+        {icon:'⚡',title:'Entregas rápidas',desc:'Proyectos en tiempo récord'},
+        {icon:'🤝',title:'Soporte continuo',desc:'Te acompañamos después de entregar'}
+    ];
+    return (
+        <section id="beneficios" style={{padding:'clamp(60px,10vw,100px) 5%',background:'#f4ede0'}}>
+            <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',
+                gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,400px),1fr))',
+                gap:'clamp(2rem,5vw,5rem)',alignItems:'center'}}>
+                <AnimatedSection>
+                    <div style={{width:'100%',aspectRatio:'1',background:'#ebe0cc',borderRadius:'8px',
+                        display:'flex',alignItems:'center',justifyContent:'center',border:'1px solid #d6c8af'}}>
+                        <p style={{color:'#5c5346',fontSize:'clamp(0.85rem,2vw,1rem)',fontWeight:'600',textAlign:'center',padding:'2rem'}}>
+                            📷 Espacio para imagen<br/><small>(Equipo colaborando o cliente feliz)</small>
+                        </p>
+                    </div>
+                </AnimatedSection>
+                <AnimatedSection delay={0.2}>
+                    <div>
+                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'rgba(177,74,44,0.1)',
+                            border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
+                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'#b14a2c',
+                            marginBottom:'1rem',fontFamily:'JetBrains Mono,monospace',letterSpacing:'2px'}}>¿POR QUÉ TAOTECH?</span>
+                        <h2 style={{fontSize:'clamp(1.6rem,4vw,2.5rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1.5rem',lineHeight:'1.2'}}>
+                            Tecnología que entiende tu negocio
+                        </h2>
+                        <p style={{color:'#5c5346',lineHeight:'1.8',marginBottom:'2rem',fontSize:'clamp(0.9rem,2vw,1.05rem)'}}>
+                            Sabemos que la tecnología puede parecer complicada. Por eso, nos encargamos de todo el proceso técnico
+                            mientras tú te enfocas en lo que mejor sabes hacer: tu negocio.
+                        </p>
+                        <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
+                            {benefits.map((b,i)=>(
+                                <div key={i} style={{display:'flex',gap:'1rem',alignItems:'flex-start'}}>
+                                    <div style={{width:'clamp(40px,8vw,50px)',height:'clamp(40px,8vw,50px)',
+                                        background:'rgba(177,74,44,0.1)',borderRadius:'8px',display:'flex',
+                                        alignItems:'center',justifyContent:'center',fontSize:'clamp(1.2rem,3vw,1.5rem)',flexShrink:0}}>{b.icon}</div>
+                                    <div>
+                                        <div style={{fontWeight:'700',color:'#1f1a14',fontSize:'clamp(0.95rem,2vw,1.05rem)'}}>{b.title}</div>
+                                        <div style={{color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{b.desc}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </AnimatedSection>
+            </div>
+        </section>
+    );
+};
+
+const Stats = () => {
+    const stats=[{number:'50+',label:'Proyectos entregados'},{number:'30+',label:'Clientes satisfechos'},{number:'8+',label:'Años de experiencia'},{number:'24/7',label:'Soporte disponible'}];
+    return (
+        <section style={{padding:'clamp(50px,8vw,80px) 5%',background:'#1f1a14'}}>
+            <div style={{maxWidth:'1000px',margin:'0 auto',display:'grid',
+                gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'clamp(1.5rem,4vw,2rem)',textAlign:'center'}}>
+                {stats.map((s,i)=>(
+                    <AnimatedSection key={i} delay={i*0.1}>
+                        <div>
+                            <div style={{fontSize:'clamp(2rem,6vw,3rem)',fontWeight:'900',color:'#b14a2c',marginBottom:'0.5rem',fontFamily:'Outfit,sans-serif'}}>{s.number}</div>
+                            <div style={{fontSize:'clamp(0.75rem,2vw,0.95rem)',fontWeight:'600',color:'#d6c8af'}}>{s.label}</div>
                         </div>
                     </AnimatedSection>
-                </section>
-            );
-        };
+                ))}
+            </div>
+        </section>
+    );
+};
 
-        // Services Section
-        const Services = () => {
-            const containerStyle = {
-                padding: 'clamp(60px, 10vw, 100px) 5%',
-                background: 'white'
-            };
+const CTA = () => (
+    <section style={{padding:'clamp(60px,10vw,100px) 5%',background:'#ebe0cc'}}>
+        <AnimatedSection>
+            <div style={{maxWidth:'800px',margin:'0 auto',textAlign:'center'}}>
+                <h2 style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1rem',lineHeight:'1.2'}}>
+                    ¿Listo para <span style={{color:'#b14a2c'}}>digitalizar</span> tu negocio?
+                </h2>
+                <p style={{fontSize:'clamp(0.95rem,2vw,1.15rem)',color:'#5c5346',marginBottom:'2rem',lineHeight:'1.7'}}>
+                    Agenda una llamada gratuita y cuéntanos tu idea. Te asesoramos sin compromiso y te damos un presupuesto claro.
+                </p>
+                <button onClick={()=>document.getElementById('contacto').scrollIntoView({behavior:'smooth'})}
+                    style={{padding:'clamp(1rem,2vw,1.25rem) clamp(2rem,4vw,3rem)',background:'#1f1a14',color:'#f4ede0',
+                    border:'none',borderRadius:'4px',fontFamily:'Outfit,sans-serif',fontWeight:'700',
+                    fontSize:'clamp(0.95rem,2vw,1.1rem)',cursor:'pointer'}}>Agendar Llamada Gratis</button>
+            </div>
+        </AnimatedSection>
+    </section>
+);
 
-            const contentStyle = {
-                maxWidth: '1200px',
-                margin: '0 auto'
-            };
+/* ══════════════════════════════════════════════
+   CONTACT — formulario funcional vía mailto + WhatsApp
+══════════════════════════════════════════════ */
+const Contact = () => {
+    const [form, setForm] = useState({nombre:'', email:'', telefono:'', mensaje:''});
+    const [sending, setSending] = useState(false);
+    const [toast, setToast] = useState(null); // {type:'success'|'error', msg:''}
 
-            const headerStyle = {
-                textAlign: 'center',
-                marginBottom: 'clamp(2rem, 5vw, 4rem)'
-            };
+    const showToast = (type, msg) => {
+        setToast({type, msg});
+        setTimeout(()=>setToast(null), 4000);
+    };
 
-            const labelStyle = {
-                display: 'inline-block',
-                padding: '0.5rem 1rem',
-                background: 'rgba(5, 151, 242, 0.1)',
-                borderRadius: '50px',
-                fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
-                fontWeight: '700',
-                color: '#0597F2',
-                marginBottom: '1rem'
-            };
+    const handleChange = (e) => {
+        setForm(prev=>({...prev, [e.target.name]: e.target.value}));
+    };
 
-            const titleStyle = {
-                fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
-                fontWeight: '800',
-                color: '#0f172a',
-                marginBottom: '1rem',
-                fontFamily: 'Outfit, sans-serif'
-            };
+    const handleSubmit = () => {
+        // Basic validation
+        if (!form.nombre.trim() || !form.email.trim() || !form.mensaje.trim()) {
+            showToast('error', '⚠️ Por favor completa nombre, email y tu idea.');
+            return;
+        }
+        if (!/\S+@\S+\.\S+/.test(form.email)) {
+            showToast('error', '⚠️ Ingresa un email válido.');
+            return;
+        }
 
-            const subtitleStyle = {
-                fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-                color: '#64748b',
-                maxWidth: '600px',
-                margin: '0 auto',
-                lineHeight: '1.7'
-            };
+        setSending(true);
 
-            const gridStyle = {
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-                gap: 'clamp(1rem, 3vw, 2rem)'
-            };
+        // Build mailto link — opens default mail client with pre-filled content
+        const subject = encodeURIComponent(`[TaoTech] Solicitud de ${form.nombre}`);
+        const body = encodeURIComponent(
+`Nombre: ${form.nombre}
+Email: ${form.email}
+Teléfono: ${form.telefono || 'No indicado'}
 
-            const services = [
-                {
-                    icon: '🌐',
-                    title: 'Desarrollo Web',
-                    description: 'Sitios web modernos, rápidos y optimizados para convertir visitantes en clientes.',
-                    features: ['Landing Pages', 'E-commerce', 'Portales Web']
-                },
-                {
-                    icon: '📱',
-                    title: 'Aplicaciones Móviles',
-                    description: 'Apps nativas y multiplataforma que llevan tu negocio al bolsillo de tus clientes.',
-                    features: ['iOS & Android', 'Apps Híbridas', 'PWA']
-                },
-                {
-                    icon: '⚙️',
-                    title: 'Software a Medida',
-                    description: 'Sistemas personalizados que automatizan y optimizan los procesos de tu negocio.',
-                    features: ['CRM', 'Inventarios', 'Gestión']
-                },
-                {
-                    icon: '🎨',
-                    title: 'Diseño UI/UX',
-                    description: 'Interfaces atractivas y experiencias de usuario que enamoran a tus clientes.',
-                    features: ['Prototipos', 'Branding', 'Diseño Web']
-                },
-                {
-                    icon: '📊',
-                    title: 'Consultoría Tech',
-                    description: 'Te asesoramos para elegir las mejores soluciones tecnológicas para tu negocio.',
-                    features: ['Análisis', 'Estrategia', 'Optimización']
-                },
-                {
-                    icon: '🔧',
-                    title: 'Mantenimiento',
-                    description: 'Soporte continuo para que tus sistemas siempre funcionen al 100%.',
-                    features: ['Actualizaciones', 'Soporte 24/7', 'Backups']
-                }
-            ];
+Mensaje:
+${form.mensaje}`
+        );
+        const mailtoLink = `mailto:taotech.co@gmail.com?subject=${subject}&body=${body}`;
 
-            const ServiceCard = ({ service, index }) => {
-                const [isHovered, setIsHovered] = useState(false);
+        // Open mail client
+        window.location.href = mailtoLink;
 
-                const cardStyle = {
-                    background: isHovered ? 'linear-gradient(145deg, #ffffff, #f8fafc)' : 'white',
-                    border: `1px solid ${isHovered ? '#0597F2' : '#e2e8f0'}`,
-                    borderRadius: '20px',
-                    padding: 'clamp(1.5rem, 4vw, 2.5rem)',
-                    transition: 'all 0.4s ease',
-                    transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
-                    boxShadow: isHovered ? '0 25px 50px rgba(5, 151, 242, 0.15)' : '0 4px 20px rgba(0,0,0,0.03)',
-                    cursor: 'pointer'
-                };
+        // Small delay then show success + reset
+        setTimeout(()=>{
+            setSending(false);
+            setForm({nombre:'', email:'', telefono:'', mensaje:''});
+            showToast('success', '✅ ¡Tu cliente de correo se abrió! Revisa el borrador y envía.');
+        }, 800);
+    };
 
-                const iconStyle = {
-                    width: 'clamp(50px, 10vw, 70px)',
-                    height: 'clamp(50px, 10vw, 70px)',
-                    background: isHovered 
-                        ? 'linear-gradient(135deg, #0597F2, #056CF2)' 
-                        : 'linear-gradient(135deg, rgba(5, 151, 242, 0.1), rgba(5, 108, 242, 0.05))',
-                    borderRadius: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
-                    marginBottom: '1.5rem',
-                    transition: 'all 0.4s ease',
-                    filter: isHovered ? 'grayscale(1) brightness(10)' : 'none'
-                };
+    const openWhatsApp = () => {
+        const text = encodeURIComponent('Hola TaoTech, quiero información sobre sus servicios.');
+        window.open(`https://wa.me/573227446219?text=${text}`, '_blank');
+    };
 
-                const cardTitleStyle = {
-                    fontSize: 'clamp(1.1rem, 3vw, 1.4rem)',
-                    fontWeight: '800',
-                    color: '#0f172a',
-                    marginBottom: '0.75rem',
-                    fontFamily: 'Outfit, sans-serif'
-                };
+    const inp = {
+        width:'100%', padding:'clamp(0.8rem,2vw,1rem) clamp(1rem,2vw,1.25rem)',
+        border:'1.5px solid #d6c8af', borderRadius:'6px',
+        fontFamily:'DM Sans,sans-serif', fontSize:'clamp(0.9rem,2vw,1rem)',
+        outline:'none', background:'#fffcf5', color:'#1f1a14', transition:'border-color 0.3s'
+    };
 
-                const cardDescStyle = {
-                    color: '#64748b',
-                    lineHeight: '1.7',
-                    marginBottom: '1.5rem',
-                    fontSize: 'clamp(0.85rem, 2vw, 1rem)'
-                };
+    return (
+        <>
+        {/* Toast notification */}
+        {toast && (
+            <div className={`toast ${toast.type}`}>{toast.msg}</div>
+        )}
 
-                const featuresStyle = {
-                    display: 'flex',
-                    gap: '0.5rem',
-                    flexWrap: 'wrap'
-                };
+        <section id="contacto" style={{padding:'clamp(60px,10vw,100px) 5%',background:'#f4ede0'}}>
+            <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',
+                gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,350px),1fr))',gap:'clamp(2rem,5vw,4rem)'}}>
 
-                const featureTagStyle = {
-                    padding: '0.4rem 0.8rem',
-                    background: 'rgba(5, 151, 242, 0.08)',
-                    borderRadius: '8px',
-                    fontSize: 'clamp(0.7rem, 1.5vw, 0.8rem)',
-                    fontWeight: '600',
-                    color: '#0597F2'
-                };
+                {/* Left col — info */}
+                <AnimatedSection>
+                    <div>
+                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'rgba(177,74,44,0.1)',
+                            border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
+                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'#b14a2c',
+                            marginBottom:'1rem',fontFamily:'JetBrains Mono,monospace',letterSpacing:'2px'}}>CONTACTO</span>
+                        <h2 style={{fontSize:'clamp(1.6rem,4vw,2.5rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1.5rem'}}>Hablemos de tu proyecto</h2>
+                        <p style={{color:'#5c5346',lineHeight:'1.8',marginBottom:'2rem',fontSize:'clamp(0.9rem,2vw,1rem)'}}>
+                            Estamos listos para escucharte. Cuéntanos tu idea y te responderemos en menos de 24 horas con una propuesta personalizada.
+                        </p>
 
-                return (
-                    <AnimatedSection delay={index * 0.1}>
-                        <div 
-                            style={cardStyle}
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
+                        {/* Email */}
+                        <div style={{display:'flex',alignItems:'center',gap:'1rem',marginBottom:'1.5rem'}}>
+                            <div style={{width:'clamp(45px,8vw,55px)',height:'clamp(45px,8vw,55px)',
+                                background:'rgba(177,74,44,0.1)',borderRadius:'8px',display:'flex',
+                                alignItems:'center',justifyContent:'center',fontSize:'clamp(1.2rem,3vw,1.5rem)'}}>📧</div>
+                            <div>
+                                <div style={{fontSize:'clamp(0.75rem,1.5vw,0.85rem)',color:'#5c5346',fontWeight:'600'}}>Email</div>
+                                <a href="mailto:taotech.co@gmail.com" style={{color:'#1f1a14',fontWeight:'700',fontSize:'clamp(0.85rem,2vw,1.05rem)',textDecoration:'none'}}>
+                                    taotech.co@gmail.com
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* WhatsApp — botón funcional */}
+                        <div style={{display:'flex',alignItems:'center',gap:'1rem',marginBottom:'2rem'}}>
+                            <div style={{width:'clamp(45px,8vw,55px)',height:'clamp(45px,8vw,55px)',
+                                background:'rgba(177,74,44,0.1)',borderRadius:'8px',display:'flex',
+                                alignItems:'center',justifyContent:'center',fontSize:'clamp(1.2rem,3vw,1.5rem)'}}>📱</div>
+                            <div>
+                                <div style={{fontSize:'clamp(0.75rem,1.5vw,0.85rem)',color:'#5c5346',fontWeight:'600'}}>WhatsApp</div>
+                                <a href="https://wa.me/573227446219" target="_blank" rel="noopener noreferrer"
+                                    style={{color:'#1f1a14',fontWeight:'700',fontSize:'clamp(0.85rem,2vw,1.05rem)',textDecoration:'none'}}>
+                                    +57 322 7446219
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Quick WhatsApp CTA */}
+                        <button onClick={openWhatsApp} style={{
+                            display:'flex', alignItems:'center', gap:'0.6rem',
+                            padding:'0.85rem 1.5rem',
+                            background:'#25D366', color:'#fff',
+                            border:'none', borderRadius:'6px',
+                            fontFamily:'Outfit,sans-serif', fontWeight:'700',
+                            fontSize:'clamp(0.85rem,2vw,1rem)', cursor:'pointer',
+                            transition:'opacity 0.2s'
+                        }}
+                        onMouseEnter={e=>e.currentTarget.style.opacity='0.88'}
+                        onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
+                            <span style={{fontSize:'1.2rem'}}>💬</span> Chatear por WhatsApp
+                        </button>
+                    </div>
+                </AnimatedSection>
+
+                {/* Right col — form */}
+                <AnimatedSection delay={0.2}>
+                    <div style={{background:'#ebe0cc',borderRadius:'8px',padding:'clamp(1.5rem,4vw,3rem)',border:'1px solid #d6c8af'}}>
+                        <h3 style={{fontSize:'clamp(1.2rem,3vw,1.5rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1.5rem'}}>Envíanos un mensaje</h3>
+
+                        <div style={{marginBottom:'1rem'}}>
+                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Nombre completo *</label>
+                            <input
+                                type="text" name="nombre" value={form.nombre}
+                                onChange={handleChange}
+                                style={inp} placeholder="Tu nombre"
+                                onFocus={e=>e.target.style.borderColor='#b14a2c'}
+                                onBlur={e=>e.target.style.borderColor='#d6c8af'}
+                            />
+                        </div>
+
+                        <div style={{marginBottom:'1rem'}}>
+                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Email *</label>
+                            <input
+                                type="email" name="email" value={form.email}
+                                onChange={handleChange}
+                                style={inp} placeholder="tu@email.com"
+                                onFocus={e=>e.target.style.borderColor='#b14a2c'}
+                                onBlur={e=>e.target.style.borderColor='#d6c8af'}
+                            />
+                        </div>
+
+                        <div style={{marginBottom:'1rem'}}>
+                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Teléfono <span style={{fontWeight:'400',opacity:0.6}}>(opcional)</span></label>
+                            <input
+                                type="tel" name="telefono" value={form.telefono}
+                                onChange={handleChange}
+                                style={inp} placeholder="+57 300 000 0000"
+                                onFocus={e=>e.target.style.borderColor='#b14a2c'}
+                                onBlur={e=>e.target.style.borderColor='#d6c8af'}
+                            />
+                        </div>
+
+                        <div style={{marginBottom:'1.5rem'}}>
+                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Cuéntanos tu idea *</label>
+                            <textarea
+                                name="mensaje" value={form.mensaje}
+                                onChange={handleChange}
+                                style={{...inp,minHeight:'110px',resize:'vertical'}}
+                                placeholder="Describe brevemente lo que necesitas..."
+                                onFocus={e=>e.target.style.borderColor='#b14a2c'}
+                                onBlur={e=>e.target.style.borderColor='#d6c8af'}
+                            />
+                        </div>
+
+                        <button
+                            onClick={handleSubmit}
+                            disabled={sending}
+                            style={{width:'100%',padding:'clamp(0.85rem,2vw,1.1rem)',
+                                background: sending ? '#5c5346' : '#1f1a14',
+                                color:'#f4ede0',border:'none',borderRadius:'6px',
+                                fontFamily:'Outfit,sans-serif',fontWeight:'700',
+                                fontSize:'clamp(0.9rem,2vw,1rem)',cursor: sending ? 'not-allowed' : 'pointer',
+                                transition:'all 0.2s', letterSpacing:'0.5px'
+                            }}
+                            onMouseEnter={e=>{ if(!sending) e.currentTarget.style.background='#3a3028'; }}
+                            onMouseLeave={e=>{ if(!sending) e.currentTarget.style.background='#1f1a14'; }}
                         >
-                            <div style={iconStyle}>{service.icon}</div>
-                            <h3 style={cardTitleStyle}>{service.title}</h3>
-                            <p style={cardDescStyle}>{service.description}</p>
-                            <div style={featuresStyle}>
-                                {service.features.map((feature, i) => (
-                                    <span key={i} style={featureTagStyle}>{feature}</span>
-                                ))}
-                            </div>
-                        </div>
-                    </AnimatedSection>
-                );
-            };
+                            {sending ? 'Abriendo correo…' : 'Enviar Mensaje ✉️'}
+                        </button>
 
-            return (
-                <section id="servicios" style={containerStyle}>
-                    <div style={contentStyle}>
-                        <AnimatedSection>
-                            <div style={headerStyle}>
-                                <span style={labelStyle}>Nuestros Servicios</span>
-                                <h2 style={titleStyle}>Soluciones para cada necesidad</h2>
-                                <p style={subtitleStyle}>
-                                    Ofrecemos un amplio catálogo de servicios tecnológicos adaptados al tamaño y presupuesto de tu negocio.
-                                </p>
-                            </div>
-                        </AnimatedSection>
-                        
-                        <div style={gridStyle}>
-                            {services.map((service, index) => (
-                                <ServiceCard key={index} service={service} index={index} />
-                            ))}
-                        </div>
+                        <p style={{textAlign:'center',marginTop:'1rem',fontSize:'0.8rem',color:'#5c5346'}}>
+                            También puedes escribirnos directamente por{' '}
+                            <span onClick={openWhatsApp} style={{color:'#b14a2c',fontWeight:'600',cursor:'pointer',textDecoration:'underline'}}>
+                                WhatsApp
+                            </span>
+                        </p>
                     </div>
-                </section>
-            );
-        };
+                </AnimatedSection>
+            </div>
+        </section>
+        </>
+    );
+};
 
-        // How It Works Section
-        const HowItWorks = () => {
-            const containerStyle = {
-                padding: 'clamp(60px, 10vw, 100px) 5%',
-                background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)'
-            };
-
-            const contentStyle = {
-                maxWidth: '1200px',
-                margin: '0 auto'
-            };
-
-            const headerStyle = {
-                textAlign: 'center',
-                marginBottom: 'clamp(2.5rem, 6vw, 5rem)'
-            };
-
-            const labelStyle = {
-                display: 'inline-block',
-                padding: '0.5rem 1rem',
-                background: 'rgba(5, 151, 242, 0.1)',
-                borderRadius: '50px',
-                fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
-                fontWeight: '700',
-                color: '#0597F2',
-                marginBottom: '1rem'
-            };
-
-            const titleStyle = {
-                fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
-                fontWeight: '800',
-                color: '#0f172a',
-                marginBottom: '1rem',
-                fontFamily: 'Outfit, sans-serif'
-            };
-
-            const stepsContainerStyle = {
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-                gap: 'clamp(1.5rem, 3vw, 2rem)',
-                position: 'relative'
-            };
-
-            const steps = [
-                { number: '01', title: 'Cuéntanos tu idea', description: 'Describe lo que necesitas. Sin tecnicismos, en tus propias palabras.' },
-                { number: '02', title: 'Recibe propuestas', description: 'Te presentamos opciones claras con precios y tiempos definidos.' },
-                { number: '03', title: 'Desarrollamos', description: 'Nuestros expertos trabajan en tu proyecto con actualizaciones constantes.' },
-                { number: '04', title: '¡Listo para usar!', description: 'Entregamos tu solución funcionando y te capacitamos para usarla.' }
-            ];
-
-            const StepCard = ({ step, index }) => {
-                const cardStyle = {
-                    textAlign: 'center',
-                    padding: 'clamp(1rem, 3vw, 2rem) clamp(0.5rem, 2vw, 1.5rem)',
-                    position: 'relative',
-                    background: 'white',
-                    borderRadius: '20px',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
-                };
-
-                const numberStyle = {
-                    fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-                    fontWeight: '900',
-                    background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.15), rgba(5, 108, 242, 0.05))',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    marginBottom: '0.75rem',
-                    fontFamily: 'Outfit, sans-serif'
-                };
-
-                const stepTitleStyle = {
-                    fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-                    fontWeight: '800',
-                    color: '#0f172a',
-                    marginBottom: '0.75rem',
-                    fontFamily: 'Outfit, sans-serif'
-                };
-
-                const stepDescStyle = {
-                    color: '#64748b',
-                    lineHeight: '1.7',
-                    fontSize: 'clamp(0.85rem, 2vw, 0.95rem)'
-                };
-
-                return (
-                    <AnimatedSection delay={index * 0.15}>
-                        <div style={cardStyle}>
-                            <div style={numberStyle}>{step.number}</div>
-                            <h3 style={stepTitleStyle}>{step.title}</h3>
-                            <p style={stepDescStyle}>{step.description}</p>
-                        </div>
-                    </AnimatedSection>
-                );
-            };
-
-            return (
-                <section id="como-funciona" style={containerStyle}>
-                    <div style={contentStyle}>
-                        <AnimatedSection>
-                            <div style={headerStyle}>
-                                <span style={labelStyle}>Proceso Simple</span>
-                                <h2 style={titleStyle}>¿Cómo funciona?</h2>
-                            </div>
-                        </AnimatedSection>
-                        
-                        <div style={stepsContainerStyle}>
-                            {steps.map((step, index) => (
-                                <StepCard key={index} step={step} index={index} />
-                            ))}
-                        </div>
+const Footer = () => (
+    <footer style={{padding:'clamp(2.5rem,5vw,4rem) 5% clamp(1.5rem,3vw,2rem)',background:'#1f1a14',color:'#f4ede0'}}>
+        <div style={{maxWidth:'1200px',margin:'0 auto'}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,200px),1fr))',
+                gap:'clamp(1.5rem,4vw,3rem)',marginBottom:'2rem',paddingBottom:'2rem',
+                borderBottom:'1px solid rgba(244,237,224,0.1)'}}>
+                <div style={{maxWidth:'300px'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'1rem'}}>
+                        <TaoLogo size={35} dark={true}/>
+                        <span style={{fontSize:'clamp(1.2rem,3vw,1.4rem)',fontWeight:'800',fontFamily:'Outfit,sans-serif'}}>
+                            Tao<span style={{color:'#b14a2c'}}>Tech</span>
+                        </span>
                     </div>
-                </section>
-            );
-        };
-
-        // Benefits Section
-        const Benefits = () => {
-            const containerStyle = {
-                padding: 'clamp(60px, 10vw, 100px) 5%',
-                background: 'white'
-            };
-
-            const contentStyle = {
-                maxWidth: '1200px',
-                margin: '0 auto',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
-                gap: 'clamp(2rem, 5vw, 5rem)',
-                alignItems: 'center'
-            };
-
-            const imageContainerStyle = {
-                position: 'relative',
-                order: window.innerWidth < 768 ? 2 : 1
-            };
-
-            const imageBoxStyle = {
-                width: '100%',
-                aspectRatio: '1',
-                background: 'linear-gradient(145deg, #f1f5f9, #e2e8f0)',
-                borderRadius: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 25px 50px rgba(5, 108, 242, 0.1)'
-            };
-
-            const placeholderStyle = {
-                color: '#94a3b8',
-                fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-                fontWeight: '600',
-                textAlign: 'center',
-                padding: '2rem'
-            };
-
-            const textContentStyle = {
-                padding: '1rem 0'
-            };
-
-            const labelStyle = {
-                display: 'inline-block',
-                padding: '0.5rem 1rem',
-                background: 'rgba(5, 151, 242, 0.1)',
-                borderRadius: '50px',
-                fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
-                fontWeight: '700',
-                color: '#0597F2',
-                marginBottom: '1rem'
-            };
-
-            const titleStyle = {
-                fontSize: 'clamp(1.6rem, 4vw, 2.5rem)',
-                fontWeight: '800',
-                color: '#0f172a',
-                marginBottom: '1.5rem',
-                lineHeight: '1.2',
-                fontFamily: 'Outfit, sans-serif'
-            };
-
-            const descStyle = {
-                color: '#64748b',
-                lineHeight: '1.8',
-                marginBottom: '2rem',
-                fontSize: 'clamp(0.9rem, 2vw, 1.05rem)'
-            };
-
-            const benefitsListStyle = {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1.25rem'
-            };
-
-            const benefits = [
-                { icon: '💰', title: 'Precios accesibles', desc: 'Soluciones ajustadas a tu presupuesto' },
-                { icon: '🎯', title: 'Sin tecnicismos', desc: 'Te explicamos todo de forma clara' },
-                { icon: '⚡', title: 'Entregas rápidas', desc: 'Proyectos en tiempo récord' },
-                { icon: '🤝', title: 'Soporte continuo', desc: 'Te acompañamos después de entregar' }
-            ];
-
-            const BenefitItem = ({ benefit }) => {
-                const itemStyle = {
-                    display: 'flex',
-                    gap: '1rem',
-                    alignItems: 'flex-start'
-                };
-
-                const iconStyle = {
-                    width: 'clamp(40px, 8vw, 50px)',
-                    height: 'clamp(40px, 8vw, 50px)',
-                    background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.1), rgba(5, 108, 242, 0.05))',
-                    borderRadius: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
-                    flexShrink: 0
-                };
-
-                const textStyle = {
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem'
-                };
-
-                const itemTitleStyle = {
-                    fontWeight: '700',
-                    color: '#0f172a',
-                    fontSize: 'clamp(0.95rem, 2vw, 1.05rem)'
-                };
-
-                const itemDescStyle = {
-                    color: '#64748b',
-                    fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)'
-                };
-
-                return (
-                    <div style={itemStyle}>
-                        <div style={iconStyle}>{benefit.icon}</div>
-                        <div style={textStyle}>
-                            <span style={itemTitleStyle}>{benefit.title}</span>
-                            <span style={itemDescStyle}>{benefit.desc}</span>
-                        </div>
-                    </div>
-                );
-            };
-
-            return (
-                <section id="beneficios" style={containerStyle}>
-                    <div style={contentStyle}>
-                        <AnimatedSection>
-                            <div style={imageContainerStyle}>
-                                <div style={imageBoxStyle}>
-                                    <p style={placeholderStyle}>
-                                        📷 Espacio para imagen<br/>
-                                        <small>(Equipo colaborando o cliente feliz)</small>
-                                    </p>
-                                </div>
-                            </div>
-                        </AnimatedSection>
-                        
-                        <AnimatedSection delay={0.2}>
-                            <div style={textContentStyle}>
-                                <span style={labelStyle}>¿Por qué TaoTech?</span>
-                                <h2 style={titleStyle}>Tecnología que entiende tu negocio</h2>
-                                <p style={descStyle}>
-                                    Sabemos que la tecnología puede parecer complicada. Por eso, 
-                                    nos encargamos de todo el proceso técnico mientras tú te enfocas 
-                                    en lo que mejor sabes hacer: tu negocio.
-                                </p>
-                                <div style={benefitsListStyle}>
-                                    {benefits.map((benefit, index) => (
-                                        <BenefitItem key={index} benefit={benefit} />
-                                    ))}
-                                </div>
-                            </div>
-                        </AnimatedSection>
-                    </div>
-                </section>
-            );
-        };
-
-        // Stats Section
-        const Stats = () => {
-            const containerStyle = {
-                padding: 'clamp(50px, 8vw, 80px) 5%',
-                background: 'linear-gradient(135deg, #056CF2, #0597F2)'
-            };
-
-            const contentStyle = {
-                maxWidth: '1000px',
-                margin: '0 auto',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                gap: 'clamp(1.5rem, 4vw, 2rem)',
-                textAlign: 'center'
-            };
-
-            const stats = [
-                { number: '50+', label: 'Proyectos entregados' },
-                { number: '30+', label: 'Clientes satisfechos' },
-                { number: '8+', label: 'Años de experiencia' },
-                { number: '24/7', label: 'Soporte disponible' }
-            ];
-
-            const StatItem = ({ stat, index }) => {
-                const itemStyle = {
-                    color: 'white'
-                };
-
-                const numberStyle = {
-                    fontSize: 'clamp(2rem, 6vw, 3rem)',
-                    fontWeight: '900',
-                    marginBottom: '0.5rem',
-                    fontFamily: 'Outfit, sans-serif'
-                };
-
-                const statLabelStyle = {
-                    fontSize: 'clamp(0.75rem, 2vw, 0.95rem)',
-                    fontWeight: '600',
-                    opacity: 0.9
-                };
-
-                return (
-                    <AnimatedSection delay={index * 0.1}>
-                        <div style={itemStyle}>
-                            <div style={numberStyle}>{stat.number}</div>
-                            <div style={statLabelStyle}>{stat.label}</div>
-                        </div>
-                    </AnimatedSection>
-                );
-            };
-
-            return (
-                <section style={containerStyle}>
-                    <div style={contentStyle}>
-                        {stats.map((stat, index) => (
-                            <StatItem key={index} stat={stat} index={index} />
-                        ))}
-                    </div>
-                </section>
-            );
-        };
-
-        // CTA Section
-        const CTA = () => {
-            const containerStyle = {
-                padding: 'clamp(60px, 10vw, 100px) 5%',
-                background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)'
-            };
-
-            const contentStyle = {
-                maxWidth: '800px',
-                margin: '0 auto',
-                textAlign: 'center'
-            };
-
-            const titleStyle = {
-                fontSize: 'clamp(1.6rem, 5vw, 2.8rem)',
-                fontWeight: '800',
-                color: '#0f172a',
-                marginBottom: '1rem',
-                lineHeight: '1.2',
-                fontFamily: 'Outfit, sans-serif'
-            };
-
-            const highlightStyle = {
-                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-            };
-
-            const descStyle = {
-                fontSize: 'clamp(0.95rem, 2vw, 1.15rem)',
-                color: '#64748b',
-                marginBottom: '2rem',
-                lineHeight: '1.7'
-            };
-
-            const buttonStyle = {
-                padding: 'clamp(1rem, 2vw, 1.25rem) clamp(2rem, 4vw, 3rem)',
-                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '50px',
-                fontFamily: 'Outfit, sans-serif',
-                fontWeight: '700',
-                fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
-                cursor: 'pointer',
-                boxShadow: '0 15px 40px rgba(5, 151, 242, 0.35)',
-                transition: 'all 0.3s ease'
-            };
-
-            return (
-                <section style={containerStyle}>
-                    <AnimatedSection>
-                        <div style={contentStyle}>
-                            <h2 style={titleStyle}>
-                                ¿Listo para <span style={highlightStyle}>digitalizar</span> tu negocio?
-                            </h2>
-                            <p style={descStyle}>
-                                Agenda una llamada gratuita y cuéntanos tu idea. 
-                                Te asesoramos sin compromiso y te damos un presupuesto claro.
-                            </p>
-                            <button style={buttonStyle}>Agendar Llamada Gratis</button>
-                        </div>
-                    </AnimatedSection>
-                </section>
-            );
-        };
-
-        // Contact Section
-        const Contact = () => {
-            const containerStyle = {
-                padding: 'clamp(60px, 10vw, 100px) 5%',
-                background: 'white'
-            };
-
-            const contentStyle = {
-                maxWidth: '1200px',
-                margin: '0 auto',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))',
-                gap: 'clamp(2rem, 5vw, 4rem)'
-            };
-
-            const infoStyle = {
-                padding: '1rem 0'
-            };
-
-            const labelStyle = {
-                display: 'inline-block',
-                padding: '0.5rem 1rem',
-                background: 'rgba(5, 151, 242, 0.1)',
-                borderRadius: '50px',
-                fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
-                fontWeight: '700',
-                color: '#0597F2',
-                marginBottom: '1rem'
-            };
-
-            const titleStyle = {
-                fontSize: 'clamp(1.6rem, 4vw, 2.5rem)',
-                fontWeight: '800',
-                color: '#0f172a',
-                marginBottom: '1.5rem',
-                fontFamily: 'Outfit, sans-serif'
-            };
-
-            const descStyle = {
-                color: '#64748b',
-                lineHeight: '1.8',
-                marginBottom: '2rem',
-                fontSize: 'clamp(0.9rem, 2vw, 1rem)'
-            };
-
-            const contactItemsStyle = {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1.5rem'
-            };
-
-            const contactItems = [
-                { icon: '📧', label: 'Email', value: 'brayan.correa1411@gmail.com', link: 'mailto:brayan.correa1411@gmail.com' },
-                { icon: '📱', label: 'WhatsApp', value: '+57 322 7446219', link: 'https://wa.me/573227446219' }
-            ];
-
-            const ContactItem = ({ item }) => {
-                const itemStyle = {
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem'
-                };
-
-                const iconStyle = {
-                    width: 'clamp(45px, 8vw, 55px)',
-                    height: 'clamp(45px, 8vw, 55px)',
-                    background: 'linear-gradient(135deg, rgba(5, 151, 242, 0.1), rgba(5, 108, 242, 0.05))',
-                    borderRadius: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 'clamp(1.2rem, 3vw, 1.5rem)'
-                };
-
-                const textStyle = {
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem',
-                    overflow: 'hidden'
-                };
-
-                const itemLabelStyle = {
-                    fontSize: 'clamp(0.75rem, 1.5vw, 0.85rem)',
-                    color: '#94a3b8',
-                    fontWeight: '600'
-                };
-
-                const valueStyle = {
-                    color: '#0f172a',
-                    fontWeight: '700',
-                    fontSize: 'clamp(0.85rem, 2vw, 1.05rem)',
-                    textDecoration: 'none',
-                    transition: 'color 0.3s ease',
-                    wordBreak: 'break-all'
-                };
-
-                return (
-                    <div style={itemStyle}>
-                        <div style={iconStyle}>{item.icon}</div>
-                        <div style={textStyle}>
-                            <span style={itemLabelStyle}>{item.label}</span>
-                            <a href={item.link} style={valueStyle}>{item.value}</a>
-                        </div>
-                    </div>
-                );
-            };
-
-            const formStyle = {
-                background: '#f8fafc',
-                borderRadius: '24px',
-                padding: 'clamp(1.5rem, 4vw, 3rem)',
-                border: '1px solid #e2e8f0'
-            };
-
-            const formTitleStyle = {
-                fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
-                fontWeight: '800',
-                color: '#0f172a',
-                marginBottom: '1.5rem',
-                fontFamily: 'Outfit, sans-serif'
-            };
-
-            const inputGroupStyle = {
-                marginBottom: '1rem'
-            };
-
-            const inputLabelStyle = {
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontWeight: '600',
-                color: '#475569',
-                fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)'
-            };
-
-            const inputStyle = {
-                width: '100%',
-                padding: 'clamp(0.8rem, 2vw, 1rem) clamp(1rem, 2vw, 1.25rem)',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                fontFamily: 'DM Sans, sans-serif',
-                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-                transition: 'border-color 0.3s ease',
-                outline: 'none',
-                background: 'white'
-            };
-
-            const textareaStyle = {
-                ...inputStyle,
-                minHeight: '100px',
-                resize: 'vertical'
-            };
-
-            const submitStyle = {
-                width: '100%',
-                padding: 'clamp(0.8rem, 2vw, 1rem)',
-                background: 'linear-gradient(135deg, #0597F2, #056CF2)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '12px',
-                fontFamily: 'Outfit, sans-serif',
-                fontWeight: '700',
-                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-                cursor: 'pointer',
-                marginTop: '0.5rem',
-                boxShadow: '0 10px 25px rgba(5, 151, 242, 0.25)',
-                transition: 'all 0.3s ease'
-            };
-
-            return (
-                <section id="contacto" style={containerStyle}>
-                    <div style={contentStyle}>
-                        <AnimatedSection>
-                            <div style={infoStyle}>
-                                <span style={labelStyle}>Contacto</span>
-                                <h2 style={titleStyle}>Hablemos de tu proyecto</h2>
-                                <p style={descStyle}>
-                                    Estamos listos para escucharte. Cuéntanos tu idea y te responderemos 
-                                    en menos de 24 horas con una propuesta personalizada.
-                                </p>
-                                <div style={contactItemsStyle}>
-                                    {contactItems.map((item, index) => (
-                                        <ContactItem key={index} item={item} />
-                                    ))}
-                                </div>
-                            </div>
-                        </AnimatedSection>
-                        
-                        <AnimatedSection delay={0.2}>
-                            <div style={formStyle}>
-                                <h3 style={formTitleStyle}>Envíanos un mensaje</h3>
-                                <div style={inputGroupStyle}>
-                                    <label style={inputLabelStyle}>Nombre completo</label>
-                                    <input type="text" style={inputStyle} placeholder="Tu nombre" />
-                                </div>
-                                <div style={inputGroupStyle}>
-                                    <label style={inputLabelStyle}>Email</label>
-                                    <input type="email" style={inputStyle} placeholder="tu@email.com" />
-                                </div>
-                                <div style={inputGroupStyle}>
-                                    <label style={inputLabelStyle}>Teléfono</label>
-                                    <input type="tel" style={inputStyle} placeholder="+57 300 000 0000" />
-                                </div>
-                                <div style={inputGroupStyle}>
-                                    <label style={inputLabelStyle}>Cuéntanos tu idea</label>
-                                    <textarea style={textareaStyle} placeholder="Describe brevemente lo que necesitas..."></textarea>
-                                </div>
-                                <button type="button" style={submitStyle}>Enviar Mensaje</button>
-                            </div>
-                        </AnimatedSection>
-                    </div>
-                </section>
-            );
-        };
-
-        // Footer
-        const Footer = () => {
-            const containerStyle = {
-                padding: 'clamp(2.5rem, 5vw, 4rem) 5% clamp(1.5rem, 3vw, 2rem)',
-                background: '#0f172a',
-                color: 'white'
-            };
-
-            const contentStyle = {
-                maxWidth: '1200px',
-                margin: '0 auto'
-            };
-
-            const topStyle = {
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
-                gap: 'clamp(1.5rem, 4vw, 3rem)',
-                marginBottom: '2rem',
-                paddingBottom: '2rem',
-                borderBottom: '1px solid rgba(255,255,255,0.1)'
-            };
-
-            const brandStyle = {
-                maxWidth: '300px'
-            };
-
-            const logoStyle = {
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginBottom: '1rem'
-            };
-
-            const logoTextStyle = {
-                fontSize: 'clamp(1.2rem, 3vw, 1.4rem)',
-                fontWeight: '800',
-                fontFamily: 'Outfit, sans-serif'
-            };
-
-            const brandDescStyle = {
-                color: '#94a3b8',
-                lineHeight: '1.7',
-                fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)'
-            };
-
-            const columnTitleStyle = {
-                fontWeight: '700',
-                marginBottom: '1rem',
-                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-                fontFamily: 'Outfit, sans-serif'
-            };
-
-            const linkStyle = {
-                display: 'block',
-                color: '#94a3b8',
-                textDecoration: 'none',
-                marginBottom: '0.6rem',
-                fontSize: 'clamp(0.8rem, 1.5vw, 0.9rem)',
-                transition: 'color 0.3s ease'
-            };
-
-            const bottomStyle = {
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '1rem'
-            };
-
-            const copyrightStyle = {
-                color: '#64748b',
-                fontSize: 'clamp(0.75rem, 1.5vw, 0.85rem)'
-            };
-
-            return (
-                <footer style={containerStyle}>
-                    <div style={contentStyle}>
-                        <div style={topStyle}>
-                            <div style={brandStyle}>
-                                <div style={logoStyle}>
-                                    <TaoLogo size={35} />
-                                    <span style={logoTextStyle}>TaoTech</span>
-                                </div>
-                                <p style={brandDescStyle}>
-                                    Tecnología accesible para todos. Conectamos personas y negocios con 
-                                    las mejores soluciones digitales.
-                                </p>
-                            </div>
-                            
-                            <div>
-                                <h4 style={columnTitleStyle}>Servicios</h4>
-                                <a href="#" style={linkStyle}>Desarrollo Web</a>
-                                <a href="#" style={linkStyle}>Apps Móviles</a>
-                                <a href="#" style={linkStyle}>Software a Medida</a>
-                                <a href="#" style={linkStyle}>Diseño UI/UX</a>
-                            </div>
-                            
-                            <div>
-                                <h4 style={columnTitleStyle}>Empresa</h4>
-                                <a href="#" style={linkStyle}>Sobre Nosotros</a>
-                                <a href="#" style={linkStyle}>Portafolio</a>
-                                <a href="#" style={linkStyle}>Blog</a>
-                                <a href="#" style={linkStyle}>Contacto</a>
-                            </div>
-                            
-                            <div>
-                                <h4 style={columnTitleStyle}>Contacto</h4>
-                                <a href="mailto:brayan.correa1411@gmail.com" style={linkStyle}>brayan.correa1411@gmail.com</a>
-                                <a href="https://wa.me/573227446219" style={linkStyle}>+57 322 7446219</a>
-                            </div>
-                        </div>
-                        
-                        <div style={bottomStyle}>
-                            <p style={copyrightStyle}>© 2025 TaoTech. Todos los derechos reservados.</p>
-                            <p style={copyrightStyle}>Hecho con 💙 en Colombia</p>
-                        </div>
-                    </div>
-                </footer>
-            );
-        };
-
-        // Main App
-        const App = () => {
-            return (
-                <>
-                    <Navigation />
-                    <Hero />
-                    <TrustedBy />
-                    <Services />
-                    <HowItWorks />
-                    <Benefits />
-                    <Stats />
-                    <CTA />
-                    <Contact />
-                    <Footer />
-                </>
-            );
-        };
-
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-    </script>
+                    <p style={{color:'#5c5346',lineHeight:'1.7',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>
+                        Tecnología accesible para todos. Conectamos personas y negocios con las mejores soluciones digitales.
+                    </p>
+                </div>
+                <div>
+                    <h4 style={{fontWeight:'700',marginBottom:'1rem',fontSize:'clamp(0.9rem,2vw,1rem)',color:'#d6c8af'}}>Servicios</h4>
+                    {['Desarrollo Web','Apps Móviles','Software a Medida','Diseño UI/UX'].map((l,i)=>(
+                        <a key={i} href="#servicios" style={{display:'block',color:'#5c5346',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{l}</a>
+                    ))}
+                </div>
+                <div>
+                    <h4 style={{fontWeight:'700',marginBottom:'1rem',fontSize:'clamp(0.9rem,2vw,1rem)',color:'#d6c8af'}}>Empresa</h4>
+                    {['Sobre Nosotros','Portafolio','Blog','Contacto'].map((l,i)=>(
+                        <a key={i} href="#" style={{display:'block',color:'#5c5346',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{l}</a>
+                    ))}
+                </div>
+                <div>
+                    <h4 style={{fontWeight:'700',marginBottom:'1rem',fontSize:'clamp(0.9rem,2vw,1rem)',color:'#d6c8af'}}>Contacto</h4>
+                    <a href="mailto:taotech.co@gmail.com" style={{display:'block',color:'#5c5346',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>taotech.co@gmail.com</a>
+                    <a href="https://wa.me/573227446219" target="_blank" rel="noopener noreferrer" style={{display:'block',color:'#5c5346',textDecoration:'none',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>+57 322 7446219</a>
+                </div>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'1rem'}}>
+                <p style={{color:'#5c5346',fontSize:'clamp(0.75rem,1.5vw,0.85rem)'}}>© 2025 TaoTech. Todos los derechos reservados.</p>
+                <p style={{color:'#5c5346',fontSize:'clamp(0.75rem,1.5vw,0.85rem)'}}>Hecho con ❤️ en Colombia</p>
+            </div>
+        </div>
+    </footer>
+);
+
+const App = () => (
+    <>
+        <Navigation/>
+        <Hero/>
+        <TrustedBy/>
+        <Services/>
+        <HowItWorks/>
+        <Benefits/>
+        <Stats/>
+        <CTA/>
+        <Contact/>
+        <Footer/>
+    </>
+);
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
 </body>
 </html>
