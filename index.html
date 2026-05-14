@@ -11,31 +11,105 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        :root {
-            --bg:         #f4ede0;
-            --bg-soft:    #ebe0cc;
-            --ink:        #1f1a14;
-            --ink-soft:   #5c5346;
-            --accent:     #b14a2c;
-            --accent-deep:#8a3820;
-            --gold:       #c39a4a;
-            --line:       #d6c8af;
-            --white:      #fffcf5;
+        /* ══════════════════════════════════════════════
+           TEMA CLARO (default)
+        ══════════════════════════════════════════════ */
+        :root,
+        [data-theme="light"] {
+            --bg:          #f4ede0;
+            --bg-soft:     #ebe0cc;
+            --bg-card:     #f4ede0;
+            --bg-input:    #fffcf5;
+            --bg-dark:     #1f1a14;   /* zona oscura (Stats, Footer) */
+            --ink:         #1f1a14;
+            --ink-soft:    #5c5346;
+            --ink-muted:   #5c5346;
+            --accent:      #b14a2c;
+            --accent-deep: #8a3820;
+            --gold:        #c39a4a;
+            --line:        #d6c8af;
+            --white:       #fffcf5;
+            --nav-bg:      rgba(244,237,224,0.97);
+            --shadow-hover:0 12px 32px rgba(177,74,44,0.1);
+            --tag-bg:      rgba(177,74,44,0.08);
+            --icon-bg:     rgba(177,74,44,0.1);
+            --icon-bg-hover: rgba(177,74,44,0.18);
+            --footer-text: #5c5346;
+            --footer-title:#d6c8af;
         }
+
+        /* ══════════════════════════════════════════════
+           TEMA OSCURO
+        ══════════════════════════════════════════════ */
+        [data-theme="dark"] {
+            --bg:          #1a1612;
+            --bg-soft:     #241e18;
+            --bg-card:     #2a2319;
+            --bg-input:    #2a2319;
+            --bg-dark:     #0f0c09;   /* aún más oscuro para zonas dark */
+            --ink:         #f4ede0;
+            --ink-soft:    #c0b39a;
+            --ink-muted:   #a89a82;
+            --accent:      #d96847;   /* un poco más brillante para contraste */
+            --accent-deep: #b14a2c;
+            --gold:        #d4ab5e;
+            --line:        #3d3327;
+            --white:       #2a2319;
+            --nav-bg:      rgba(26,22,18,0.97);
+            --shadow-hover:0 12px 32px rgba(217,104,71,0.15);
+            --tag-bg:      rgba(217,104,71,0.15);
+            --icon-bg:     rgba(217,104,71,0.15);
+            --icon-bg-hover: rgba(217,104,71,0.25);
+            --footer-text: #a89a82;
+            --footer-title:#d4ab5e;
+        }
+
         * { margin:0; padding:0; box-sizing:border-box; }
         html { scroll-behavior:smooth; }
-        body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink); overflow-x:hidden; }
+        body {
+            font-family:'DM Sans',sans-serif;
+            background:var(--bg);
+            color:var(--ink);
+            overflow-x:hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
         h1,h2,h3,h4,h5,h6 { font-family:'Outfit',sans-serif; }
         #root { min-height:100vh; }
+
         .mobile-menu-overlay {
             position:fixed; top:0; left:0; right:0; bottom:0;
-            background:rgba(31,26,20,0.96); backdrop-filter:blur(10px);
+            background:rgba(15,12,9,0.96); backdrop-filter:blur(10px);
             z-index:999; display:flex; flex-direction:column; align-items:center;
             justify-content:center; gap:2rem; animation:fadeIn 0.3s ease;
         }
-        .mobile-menu-overlay a { color:var(--bg); text-decoration:none; font-size:1.5rem; font-weight:600; font-family:'Outfit',sans-serif; }
+        .mobile-menu-overlay a { color:#f4ede0; text-decoration:none; font-size:1.5rem; font-weight:600; font-family:'Outfit',sans-serif; }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+
+        /* ── Theme toggle button ── */
+        .theme-toggle {
+            width: 42px; height: 42px;
+            background: var(--bg-soft);
+            border: 1.5px solid var(--line);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+        .theme-toggle svg {
+            width: 20px; height: 20px;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .theme-toggle:hover svg { transform: rotate(20deg); }
+        [data-theme="dark"] .theme-toggle svg { transform: rotate(360deg); }
+        [data-theme="dark"] .theme-toggle:hover svg { transform: rotate(380deg); }
 
         /* ── Service cards: equal height grid ── */
         .services-grid {
@@ -53,7 +127,7 @@
         .service-card {
             display: flex;
             flex-direction: column;
-            background: var(--bg);
+            background: var(--bg-card);
             border: 1px solid var(--line);
             border-radius: 10px;
             padding: clamp(1.5rem, 3vw, 2.2rem);
@@ -65,22 +139,20 @@
             background: var(--white);
             border-color: var(--accent);
             transform: translateY(-5px);
-            box-shadow: 0 12px 32px rgba(177,74,44,0.1);
+            box-shadow: var(--shadow-hover);
         }
         .service-card .icon-wrap {
             width: 58px; height: 58px;
-            background: rgba(177,74,44,0.1);
+            background: var(--icon-bg);
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.75rem;
             margin-bottom: 1.25rem;
             transition: background 0.35s ease;
             flex-shrink: 0;
-            /* FIX: use an img inside or just keep the emoji – no filter on hover */
         }
         .service-card:hover .icon-wrap {
-            background: rgba(177,74,44,0.18);
-            /* ✅ NO filter here — emoji stays visible */
+            background: var(--icon-bg-hover);
         }
         .service-card h3 {
             font-size: clamp(1rem, 2.5vw, 1.2rem);
@@ -92,7 +164,7 @@
             color: var(--ink-soft);
             line-height: 1.7;
             font-size: clamp(0.85rem, 1.8vw, 0.95rem);
-            flex: 1; /* pushes tags to bottom */
+            flex: 1;
             margin-bottom: 1.25rem;
         }
         .service-card .tags {
@@ -101,11 +173,11 @@
         }
         .service-card .tag {
             padding: 0.3rem 0.7rem;
-            background: rgba(177,74,44,0.08);
+            background: var(--tag-bg);
             border-radius: 4px;
             font-size: clamp(0.7rem, 1.4vw, 0.78rem);
             font-weight: 600;
-            color: var(--accent-deep);
+            color: var(--accent);
         }
 
         /* ── Form toast ── */
@@ -128,7 +200,68 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, createContext, useContext } = React;
+
+/* ══════════════════════════════════════════════
+   THEME CONTEXT — persiste en localStorage
+══════════════════════════════════════════════ */
+const ThemeContext = createContext();
+
+const ThemeProvider = ({children}) => {
+    const [theme, setTheme] = useState(() => {
+        // 1. Lee del localStorage
+        const saved = localStorage.getItem('taotech-theme');
+        if (saved === 'dark' || saved === 'light') return saved;
+        // 2. Si no hay, respeta la preferencia del sistema
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+        }
+        return 'light';
+    });
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('taotech-theme', theme);
+    }, [theme]);
+
+    const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+
+    return (
+        <ThemeContext.Provider value={{theme, toggleTheme}}>
+            {children}
+        </ThemeContext.Provider>
+    );
+};
+
+const useTheme = () => useContext(ThemeContext);
+
+/* ══════════════════════════════════════════════
+   THEME TOGGLE BUTTON
+══════════════════════════════════════════════ */
+const ThemeToggle = () => {
+    const {theme, toggleTheme} = useTheme();
+    return (
+        <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+            title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
+        >
+            {theme === 'light' ? (
+                /* Luna */
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color:'var(--ink)'}}>
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            ) : (
+                /* Sol */
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color:'var(--gold)'}}>
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>
+            )}
+        </button>
+    );
+};
 
 const useScrollAnimation = (threshold=0.1) => {
     const ref = useRef(null);
@@ -155,10 +288,15 @@ const AnimatedSection = ({children,delay=0,className=''}) => {
     );
 };
 
-const TaoLogo = ({size=45, dark=false}) => {
-    const bg     = dark ? '#1f1a14' : '#f4ede0';
-    const ring   = dark ? '#f4ede0' : '#1f1a14';
-    const kanji  = dark ? '#f4ede0' : '#1f1a14';
+/* ══════════════════════════════════════════════
+   LOGO — ahora reacciona al tema
+══════════════════════════════════════════════ */
+const TaoLogo = ({size=45, forceDark=false}) => {
+    const {theme} = useTheme();
+    const isDark = forceDark || theme === 'dark';
+    const bg     = isDark ? '#1f1a14' : '#f4ede0';
+    const ring   = isDark ? '#f4ede0' : '#1f1a14';
+    const kanji  = isDark ? '#f4ede0' : '#1f1a14';
     return (
         <svg width={size} height={size} viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="48" fill={bg} stroke={ring} strokeWidth="3"/>
@@ -182,35 +320,39 @@ const Navigation = () => {
     },[]);
     const nav={position:'fixed',top:0,width:'100%',padding:scrolled?'0.75rem 5%':'1rem 5%',
         display:'flex',justifyContent:'space-between',alignItems:'center',zIndex:1000,
-        background:scrolled?'rgba(244,237,224,0.97)':'transparent',
+        background:scrolled?'var(--nav-bg)':'transparent',
         backdropFilter:scrolled?'blur(20px)':'none',
         boxShadow:scrolled?'0 4px 30px rgba(177,74,44,0.08)':'none',
-        borderBottom:scrolled?'1px solid #d6c8af':'none',transition:'all 0.3s ease'};
-    const cta={padding:'0.7rem 1.4rem',background:'#1f1a14',color:'#f4ede0',border:'none',
+        borderBottom:scrolled?'1px solid var(--line)':'none',transition:'all 0.3s ease'};
+    const cta={padding:'0.7rem 1.4rem',background:'var(--ink)',color:'var(--bg)',border:'none',
         borderRadius:'4px',fontFamily:'Outfit,sans-serif',fontWeight:'600',fontSize:'0.9rem',cursor:'pointer'};
-    const burger={width:'40px',height:'40px',background:'#1f1a14',border:'none',borderRadius:'6px',
+    const burger={width:'40px',height:'40px',background:'var(--ink)',border:'none',borderRadius:'6px',
         cursor:'pointer',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'5px',padding:'10px'};
     return (
         <>
         <nav style={nav}>
             <a href="#" style={{display:'flex',alignItems:'center',gap:'0.6rem',textDecoration:'none'}}>
                 <TaoLogo size={40}/>
-                <span style={{fontSize:'clamp(1.3rem,4vw,1.6rem)',fontWeight:'800',fontFamily:'Outfit,sans-serif',color:'#1f1a14'}}>
-                    Tao<span style={{color:'#b14a2c'}}>Tech</span>
+                <span style={{fontSize:'clamp(1.3rem,4vw,1.6rem)',fontWeight:'800',fontFamily:'Outfit,sans-serif',color:'var(--ink)'}}>
+                    Tao<span style={{color:'var(--accent)'}}>Tech</span>
                 </span>
             </a>
             <ul style={{display:'flex',gap:'clamp(1rem,3vw,2.5rem)',listStyle:'none',alignItems:'center'}} className="desktop-nav">
-                <li><a href="#servicios"     style={{color:'#5c5346',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Servicios</a></li>
-                <li><a href="#como-funciona" style={{color:'#5c5346',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Proceso</a></li>
-                <li><a href="#beneficios"    style={{color:'#5c5346',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Beneficios</a></li>
-                <li><a href="#contacto"      style={{color:'#5c5346',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Contacto</a></li>
+                <li><a href="#servicios"     style={{color:'var(--ink-soft)',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Servicios</a></li>
+                <li><a href="#como-funciona" style={{color:'var(--ink-soft)',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Proceso</a></li>
+                <li><a href="#beneficios"    style={{color:'var(--ink-soft)',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Beneficios</a></li>
+                <li><a href="#contacto"      style={{color:'var(--ink-soft)',textDecoration:'none',fontWeight:'600',fontSize:'0.95rem'}}>Contacto</a></li>
                 <li><button style={cta} onClick={()=>document.getElementById('contacto').scrollIntoView({behavior:'smooth'})}>Comenzar</button></li>
+                <li><ThemeToggle/></li>
             </ul>
-            <button style={burger} className="mobile-menu-btn" onClick={()=>setMobileOpen(true)}>
-                <span style={{width:'20px',height:'2px',background:'#f4ede0',borderRadius:'2px'}}/>
-                <span style={{width:'20px',height:'2px',background:'#f4ede0',borderRadius:'2px'}}/>
-                <span style={{width:'20px',height:'2px',background:'#f4ede0',borderRadius:'2px'}}/>
-            </button>
+            <div style={{display:'flex',gap:'0.6rem',alignItems:'center'}} className="mobile-menu-btn">
+                <ThemeToggle/>
+                <button style={burger} onClick={()=>setMobileOpen(true)}>
+                    <span style={{width:'20px',height:'2px',background:'var(--bg)',borderRadius:'2px'}}/>
+                    <span style={{width:'20px',height:'2px',background:'var(--bg)',borderRadius:'2px'}}/>
+                    <span style={{width:'20px',height:'2px',background:'var(--bg)',borderRadius:'2px'}}/>
+                </button>
+            </div>
         </nav>
         {mobileOpen && (
             <div className="mobile-menu-overlay" onClick={()=>setMobileOpen(false)}>
@@ -219,7 +361,7 @@ const Navigation = () => {
                 <a href="#como-funciona" onClick={()=>setMobileOpen(false)}>Proceso</a>
                 <a href="#beneficios"    onClick={()=>setMobileOpen(false)}>Beneficios</a>
                 <a href="#contacto"      onClick={()=>setMobileOpen(false)}>Contacto</a>
-                <button style={{padding:'1rem 2rem',background:'#1f1a14',color:'#f4ede0',border:'none',borderRadius:'4px',fontFamily:'Outfit,sans-serif',fontWeight:'700',fontSize:'1rem',cursor:'pointer',marginTop:'1rem'}}>Comenzar</button>
+                <button onClick={()=>{document.getElementById('contacto').scrollIntoView({behavior:'smooth'}); setMobileOpen(false);}} style={{padding:'1rem 2rem',background:'#b14a2c',color:'#f4ede0',border:'none',borderRadius:'4px',fontFamily:'Outfit,sans-serif',fontWeight:'700',fontSize:'1rem',cursor:'pointer',marginTop:'1rem'}}>Comenzar</button>
             </div>
         )}
         </>
@@ -229,7 +371,7 @@ const Navigation = () => {
 const Hero = () => (
     <section style={{minHeight:'100vh',display:'flex',alignItems:'center',
         padding:'clamp(100px,15vh,140px) 5% clamp(60px,10vh,100px)',
-        background:'#f4ede0',position:'relative',overflow:'hidden'}}>
+        background:'var(--bg)',position:'relative',overflow:'hidden'}}>
         <div style={{position:'absolute',top:'-20%',right:'-10%',width:'60%',height:'140%',
             background:'radial-gradient(ellipse at center,rgba(177,74,44,0.07) 0%,transparent 70%)',pointerEvents:'none'}}/>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,450px),1fr))',
@@ -237,30 +379,30 @@ const Hero = () => (
             <AnimatedSection>
                 <div style={{maxWidth:'600px'}}>
                     <div style={{display:'inline-flex',alignItems:'center',gap:'0.5rem',
-                        padding:'0.5rem 1rem',background:'rgba(177,74,44,0.1)',
+                        padding:'0.5rem 1rem',background:'var(--icon-bg)',
                         border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
-                        fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'600',color:'#b14a2c',marginBottom:'1.5rem'}}>
+                        fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'600',color:'var(--accent)',marginBottom:'1.5rem'}}>
                         <span>☯</span><span>El equilibrio perfecto</span>
                     </div>
                     <h1 style={{fontSize:'clamp(2rem,6vw,3.5rem)',fontWeight:'900',lineHeight:'1.15',
-                        color:'#1f1a14',marginBottom:'1.5rem'}}>
+                        color:'var(--ink)',marginBottom:'1.5rem'}}>
                         Impulsa tu negocio con{' '}
-                        <span style={{color:'#b14a2c'}}>tecnología accesible</span>
+                        <span style={{color:'var(--accent)'}}>tecnología accesible</span>
                     </h1>
-                    <p style={{fontSize:'clamp(1rem,2.5vw,1.2rem)',color:'#5c5346',lineHeight:'1.8',marginBottom:'2rem'}}>
+                    <p style={{fontSize:'clamp(1rem,2.5vw,1.2rem)',color:'var(--ink-soft)',lineHeight:'1.8',marginBottom:'2rem'}}>
                         Conectamos personas y negocios con programadores profesionales.
                         Desarrollo web, apps y soluciones digitales a medida, de forma sencilla y al alcance de todos.
                     </p>
                     <div style={{display:'flex',gap:'1rem',flexWrap:'wrap'}}>
                         <button onClick={()=>document.getElementById('contacto').scrollIntoView({behavior:'smooth'})}
                             style={{padding:'clamp(0.8rem,2vw,1rem) clamp(1.5rem,4vw,2.5rem)',
-                            background:'#1f1a14',color:'#f4ede0',border:'none',borderRadius:'4px',
+                            background:'var(--ink)',color:'var(--bg)',border:'none',borderRadius:'4px',
                             fontFamily:'Outfit,sans-serif',fontWeight:'700',fontSize:'clamp(0.9rem,2vw,1rem)',cursor:'pointer'}}>
                             Solicitar Cotización
                         </button>
                         <button onClick={()=>document.getElementById('servicios').scrollIntoView({behavior:'smooth'})}
                             style={{padding:'clamp(0.8rem,2vw,1rem) clamp(1.5rem,4vw,2.5rem)',
-                            background:'transparent',color:'#b14a2c',border:'2px solid #b14a2c',borderRadius:'4px',
+                            background:'transparent',color:'var(--accent)',border:'2px solid var(--accent)',borderRadius:'4px',
                             fontFamily:'Outfit,sans-serif',fontWeight:'700',fontSize:'clamp(0.9rem,2vw,1rem)',cursor:'pointer'}}>
                             Ver Servicios
                         </button>
@@ -269,31 +411,31 @@ const Hero = () => (
             </AnimatedSection>
             <AnimatedSection delay={0.2}>
                 <div style={{position:'relative',display:'flex',justifyContent:'center',alignItems:'center'}}>
-                    <div style={{width:'100%',maxWidth:'500px',aspectRatio:'4/3',background:'#ebe0cc',
+                    <div style={{width:'100%',maxWidth:'500px',aspectRatio:'4/3',background:'var(--bg-soft)',
                         borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',
-                        border:'1px solid #d6c8af',overflow:'hidden'}}>
-                        <p style={{color:'#5c5346',fontSize:'clamp(0.8rem,2vw,1rem)',fontWeight:'600',textAlign:'center',padding:'2rem'}}>
+                        border:'1px solid var(--line)',overflow:'hidden'}}>
+                        <p style={{color:'var(--ink-soft)',fontSize:'clamp(0.8rem,2vw,1rem)',fontWeight:'600',textAlign:'center',padding:'2rem'}}>
                             📷 Espacio para imagen hero<br/><small>(Dashboard o equipo trabajando)</small>
                         </p>
                     </div>
-                    <div style={{position:'absolute',top:'-10px',right:'-10px',background:'#fffcf5',
+                    <div style={{position:'absolute',top:'-10px',right:'-10px',background:'var(--white)',
                         padding:'clamp(0.6rem,2vw,1rem) clamp(0.8rem,2vw,1.5rem)',borderRadius:'8px',
-                        border:'1px solid #d6c8af',display:'flex',alignItems:'center',gap:'0.6rem',animation:'float 4s ease-in-out infinite'}}>
-                        <div style={{width:'36px',height:'36px',background:'rgba(177,74,44,0.12)',borderRadius:'50%',
+                        border:'1px solid var(--line)',display:'flex',alignItems:'center',gap:'0.6rem',animation:'float 4s ease-in-out infinite'}}>
+                        <div style={{width:'36px',height:'36px',background:'var(--icon-bg)',borderRadius:'50%',
                             display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem'}}>💻</div>
                         <div>
-                            <div style={{fontWeight:'700',color:'#1f1a14',fontSize:'0.85rem'}}>+20 Proyectos</div>
-                            <div style={{fontSize:'0.75rem',color:'#5c5346'}}>Completados</div>
+                            <div style={{fontWeight:'700',color:'var(--ink)',fontSize:'0.85rem'}}>+20 Proyectos</div>
+                            <div style={{fontSize:'0.75rem',color:'var(--ink-soft)'}}>Completados</div>
                         </div>
                     </div>
-                    <div style={{position:'absolute',bottom:'10px',left:'-10px',background:'#fffcf5',
+                    <div style={{position:'absolute',bottom:'10px',left:'-10px',background:'var(--white)',
                         padding:'clamp(0.6rem,2vw,1rem) clamp(0.8rem,2vw,1.5rem)',borderRadius:'8px',
-                        border:'1px solid #d6c8af',display:'flex',alignItems:'center',gap:'0.6rem',animation:'float 5s ease-in-out infinite reverse'}}>
+                        border:'1px solid var(--line)',display:'flex',alignItems:'center',gap:'0.6rem',animation:'float 5s ease-in-out infinite reverse'}}>
                         <div style={{width:'36px',height:'36px',background:'rgba(195,154,74,0.15)',borderRadius:'50%',
                             display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem'}}>⭐</div>
                         <div>
-                            <div style={{fontWeight:'700',color:'#1f1a14',fontSize:'0.85rem'}}>100% Satisfacción</div>
-                            <div style={{fontSize:'0.75rem',color:'#5c5346'}}>Garantizada</div>
+                            <div style={{fontWeight:'700',color:'var(--ink)',fontSize:'0.85rem'}}>100% Satisfacción</div>
+                            <div style={{fontSize:'0.75rem',color:'var(--ink-soft)'}}>Garantizada</div>
                         </div>
                     </div>
                 </div>
@@ -303,18 +445,18 @@ const Hero = () => (
 );
 
 const TrustedBy = () => (
-    <section style={{padding:'clamp(2rem,5vw,4rem) 5%',background:'#ebe0cc',borderTop:'1px solid #d6c8af',borderBottom:'1px solid #d6c8af'}}>
+    <section style={{padding:'clamp(2rem,5vw,4rem) 5%',background:'var(--bg-soft)',borderTop:'1px solid var(--line)',borderBottom:'1px solid var(--line)'}}>
         <AnimatedSection>
             <div style={{maxWidth:'1200px',margin:'0 auto',textAlign:'center'}}>
-                <p style={{fontSize:'clamp(0.75rem,2vw,0.9rem)',fontWeight:'600',color:'#5c5346',
+                <p style={{fontSize:'clamp(0.75rem,2vw,0.9rem)',fontWeight:'600',color:'var(--ink-soft)',
                     textTransform:'uppercase',letterSpacing:'3px',marginBottom:'clamp(1rem,3vw,2rem)',
                     fontFamily:'JetBrains Mono,monospace'}}>Confían en nosotros</p>
                 <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:'clamp(1.5rem,4vw,4rem)',flexWrap:'wrap'}}>
                     {[1,2,3,4,5].map(i=>(
                         <div key={i} style={{width:'clamp(80px,15vw,120px)',height:'clamp(30px,5vw,40px)',
-                            background:'rgba(31,26,20,0.06)',border:'1px solid #d6c8af',borderRadius:'4px',
+                            background:'var(--icon-bg)',border:'1px solid var(--line)',borderRadius:'4px',
                             display:'flex',alignItems:'center',justifyContent:'center',
-                            color:'#5c5346',fontSize:'clamp(0.6rem,1.5vw,0.75rem)',fontWeight:'600'}}>Logo {i}</div>
+                            color:'var(--ink-soft)',fontSize:'clamp(0.6rem,1.5vw,0.75rem)',fontWeight:'600'}}>Logo {i}</div>
                     ))}
                 </div>
             </div>
@@ -322,9 +464,6 @@ const TrustedBy = () => (
     </section>
 );
 
-/* ══════════════════════════════════════════════
-   SERVICES — equal-height cards, icon fix
-══════════════════════════════════════════════ */
 const Services = () => {
     const services = [
         {icon:'🌐',title:'Desarrollo Web',description:'Sitios web modernos, rápidos y optimizados para convertir visitantes en clientes.',features:['Landing Pages','E-commerce','Portales Web']},
@@ -336,27 +475,25 @@ const Services = () => {
     ];
 
     return (
-        <section id="servicios" style={{padding:'clamp(60px,10vw,100px) 5%',background:'#f4ede0'}}>
+        <section id="servicios" style={{padding:'clamp(60px,10vw,100px) 5%',background:'var(--bg)'}}>
             <div style={{maxWidth:'1140px',margin:'0 auto'}}>
                 <AnimatedSection>
                     <div style={{textAlign:'center',marginBottom:'clamp(2rem,5vw,4rem)'}}>
-                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'rgba(177,74,44,0.1)',
+                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'var(--icon-bg)',
                             border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
-                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'#b14a2c',
+                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'var(--accent)',
                             marginBottom:'1rem',fontFamily:'JetBrains Mono,monospace',letterSpacing:'2px'}}>NUESTROS SERVICIOS</span>
-                        <h2 style={{fontSize:'clamp(1.8rem,5vw,2.8rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1rem'}}>Soluciones para cada necesidad</h2>
-                        <p style={{fontSize:'clamp(0.9rem,2vw,1.1rem)',color:'#5c5346',maxWidth:'600px',margin:'0 auto',lineHeight:'1.7'}}>
+                        <h2 style={{fontSize:'clamp(1.8rem,5vw,2.8rem)',fontWeight:'800',color:'var(--ink)',marginBottom:'1rem'}}>Soluciones para cada necesidad</h2>
+                        <p style={{fontSize:'clamp(0.9rem,2vw,1.1rem)',color:'var(--ink-soft)',maxWidth:'600px',margin:'0 auto',lineHeight:'1.7'}}>
                             Ofrecemos un amplio catálogo de servicios tecnológicos adaptados al tamaño y presupuesto de tu negocio.
                         </p>
                     </div>
                 </AnimatedSection>
 
-                {/* Grid with equal height */}
                 <div className="services-grid">
                     {services.map((s,i)=>(
                         <AnimatedSection key={i} delay={i*0.08} style={{height:'100%'}}>
                             <div className="service-card">
-                                {/* ✅ FIX: icon-wrap solo cambia color de fondo, NO filter */}
                                 <div className="icon-wrap">{s.icon}</div>
                                 <h3>{s.title}</h3>
                                 <p>{s.description}</p>
@@ -382,26 +519,26 @@ const HowItWorks = () => {
         {number:'04',title:'¡Listo para usar!',description:'Entregamos tu solución funcionando y te capacitamos para usarla.'}
     ];
     return (
-        <section id="como-funciona" style={{padding:'clamp(60px,10vw,100px) 5%',background:'#ebe0cc'}}>
+        <section id="como-funciona" style={{padding:'clamp(60px,10vw,100px) 5%',background:'var(--bg-soft)'}}>
             <div style={{maxWidth:'1200px',margin:'0 auto'}}>
                 <AnimatedSection>
                     <div style={{textAlign:'center',marginBottom:'clamp(2.5rem,6vw,5rem)'}}>
-                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'rgba(177,74,44,0.1)',
+                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'var(--icon-bg)',
                             border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
-                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'#b14a2c',
+                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'var(--accent)',
                             marginBottom:'1rem',fontFamily:'JetBrains Mono,monospace',letterSpacing:'2px'}}>PROCESO SIMPLE</span>
-                        <h2 style={{fontSize:'clamp(1.8rem,5vw,2.8rem)',fontWeight:'800',color:'#1f1a14'}}>¿Cómo funciona?</h2>
+                        <h2 style={{fontSize:'clamp(1.8rem,5vw,2.8rem)',fontWeight:'800',color:'var(--ink)'}}>¿Cómo funciona?</h2>
                     </div>
                 </AnimatedSection>
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,240px),1fr))',gap:'clamp(1.5rem,3vw,2rem)'}}>
                     {steps.map((s,i)=>(
                         <AnimatedSection key={i} delay={i*0.15}>
                             <div style={{textAlign:'center',padding:'clamp(1.5rem,3vw,2.5rem)',
-                                background:'#f4ede0',borderRadius:'8px',border:'1px solid #d6c8af',height:'100%'}}>
-                                <div style={{fontSize:'clamp(2.5rem,6vw,4rem)',fontWeight:'900',color:'#b14a2c',
+                                background:'var(--bg)',borderRadius:'8px',border:'1px solid var(--line)',height:'100%'}}>
+                                <div style={{fontSize:'clamp(2.5rem,6vw,4rem)',fontWeight:'900',color:'var(--accent)',
                                     marginBottom:'0.75rem',fontFamily:'JetBrains Mono,monospace',opacity:'0.4'}}>{s.number}</div>
-                                <h3 style={{fontSize:'clamp(1rem,2.5vw,1.2rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'0.75rem'}}>{s.title}</h3>
-                                <p style={{color:'#5c5346',lineHeight:'1.7',fontSize:'clamp(0.85rem,2vw,0.95rem)'}}>{s.description}</p>
+                                <h3 style={{fontSize:'clamp(1rem,2.5vw,1.2rem)',fontWeight:'800',color:'var(--ink)',marginBottom:'0.75rem'}}>{s.title}</h3>
+                                <p style={{color:'var(--ink-soft)',lineHeight:'1.7',fontSize:'clamp(0.85rem,2vw,0.95rem)'}}>{s.description}</p>
                             </div>
                         </AnimatedSection>
                     ))}
@@ -419,28 +556,28 @@ const Benefits = () => {
         {icon:'🤝',title:'Soporte continuo',desc:'Te acompañamos después de entregar'}
     ];
     return (
-        <section id="beneficios" style={{padding:'clamp(60px,10vw,100px) 5%',background:'#f4ede0'}}>
+        <section id="beneficios" style={{padding:'clamp(60px,10vw,100px) 5%',background:'var(--bg)'}}>
             <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',
                 gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,400px),1fr))',
                 gap:'clamp(2rem,5vw,5rem)',alignItems:'center'}}>
                 <AnimatedSection>
-                    <div style={{width:'100%',aspectRatio:'1',background:'#ebe0cc',borderRadius:'8px',
-                        display:'flex',alignItems:'center',justifyContent:'center',border:'1px solid #d6c8af'}}>
-                        <p style={{color:'#5c5346',fontSize:'clamp(0.85rem,2vw,1rem)',fontWeight:'600',textAlign:'center',padding:'2rem'}}>
+                    <div style={{width:'100%',aspectRatio:'1',background:'var(--bg-soft)',borderRadius:'8px',
+                        display:'flex',alignItems:'center',justifyContent:'center',border:'1px solid var(--line)'}}>
+                        <p style={{color:'var(--ink-soft)',fontSize:'clamp(0.85rem,2vw,1rem)',fontWeight:'600',textAlign:'center',padding:'2rem'}}>
                             📷 Espacio para imagen<br/><small>(Equipo colaborando o cliente feliz)</small>
                         </p>
                     </div>
                 </AnimatedSection>
                 <AnimatedSection delay={0.2}>
                     <div>
-                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'rgba(177,74,44,0.1)',
+                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'var(--icon-bg)',
                             border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
-                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'#b14a2c',
+                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'var(--accent)',
                             marginBottom:'1rem',fontFamily:'JetBrains Mono,monospace',letterSpacing:'2px'}}>¿POR QUÉ TAOTECH?</span>
-                        <h2 style={{fontSize:'clamp(1.6rem,4vw,2.5rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1.5rem',lineHeight:'1.2'}}>
+                        <h2 style={{fontSize:'clamp(1.6rem,4vw,2.5rem)',fontWeight:'800',color:'var(--ink)',marginBottom:'1.5rem',lineHeight:'1.2'}}>
                             Tecnología que entiende tu negocio
                         </h2>
-                        <p style={{color:'#5c5346',lineHeight:'1.8',marginBottom:'2rem',fontSize:'clamp(0.9rem,2vw,1.05rem)'}}>
+                        <p style={{color:'var(--ink-soft)',lineHeight:'1.8',marginBottom:'2rem',fontSize:'clamp(0.9rem,2vw,1.05rem)'}}>
                             Sabemos que la tecnología puede parecer complicada. Por eso, nos encargamos de todo el proceso técnico
                             mientras tú te enfocas en lo que mejor sabes hacer: tu negocio.
                         </p>
@@ -448,11 +585,11 @@ const Benefits = () => {
                             {benefits.map((b,i)=>(
                                 <div key={i} style={{display:'flex',gap:'1rem',alignItems:'flex-start'}}>
                                     <div style={{width:'clamp(40px,8vw,50px)',height:'clamp(40px,8vw,50px)',
-                                        background:'rgba(177,74,44,0.1)',borderRadius:'8px',display:'flex',
+                                        background:'var(--icon-bg)',borderRadius:'8px',display:'flex',
                                         alignItems:'center',justifyContent:'center',fontSize:'clamp(1.2rem,3vw,1.5rem)',flexShrink:0}}>{b.icon}</div>
                                     <div>
-                                        <div style={{fontWeight:'700',color:'#1f1a14',fontSize:'clamp(0.95rem,2vw,1.05rem)'}}>{b.title}</div>
-                                        <div style={{color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{b.desc}</div>
+                                        <div style={{fontWeight:'700',color:'var(--ink)',fontSize:'clamp(0.95rem,2vw,1.05rem)'}}>{b.title}</div>
+                                        <div style={{color:'var(--ink-soft)',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{b.desc}</div>
                                     </div>
                                 </div>
                             ))}
@@ -467,13 +604,13 @@ const Benefits = () => {
 const Stats = () => {
     const stats=[{number:'50+',label:'Proyectos entregados'},{number:'30+',label:'Clientes satisfechos'},{number:'8+',label:'Años de experiencia'},{number:'24/7',label:'Soporte disponible'}];
     return (
-        <section style={{padding:'clamp(50px,8vw,80px) 5%',background:'#1f1a14'}}>
+        <section style={{padding:'clamp(50px,8vw,80px) 5%',background:'var(--bg-dark)'}}>
             <div style={{maxWidth:'1000px',margin:'0 auto',display:'grid',
                 gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'clamp(1.5rem,4vw,2rem)',textAlign:'center'}}>
                 {stats.map((s,i)=>(
                     <AnimatedSection key={i} delay={i*0.1}>
                         <div>
-                            <div style={{fontSize:'clamp(2rem,6vw,3rem)',fontWeight:'900',color:'#b14a2c',marginBottom:'0.5rem',fontFamily:'Outfit,sans-serif'}}>{s.number}</div>
+                            <div style={{fontSize:'clamp(2rem,6vw,3rem)',fontWeight:'900',color:'var(--accent)',marginBottom:'0.5rem',fontFamily:'Outfit,sans-serif'}}>{s.number}</div>
                             <div style={{fontSize:'clamp(0.75rem,2vw,0.95rem)',fontWeight:'600',color:'#d6c8af'}}>{s.label}</div>
                         </div>
                     </AnimatedSection>
@@ -484,17 +621,17 @@ const Stats = () => {
 };
 
 const CTA = () => (
-    <section style={{padding:'clamp(60px,10vw,100px) 5%',background:'#ebe0cc'}}>
+    <section style={{padding:'clamp(60px,10vw,100px) 5%',background:'var(--bg-soft)'}}>
         <AnimatedSection>
             <div style={{maxWidth:'800px',margin:'0 auto',textAlign:'center'}}>
-                <h2 style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1rem',lineHeight:'1.2'}}>
-                    ¿Listo para <span style={{color:'#b14a2c'}}>digitalizar</span> tu negocio?
+                <h2 style={{fontSize:'clamp(1.6rem,5vw,2.8rem)',fontWeight:'800',color:'var(--ink)',marginBottom:'1rem',lineHeight:'1.2'}}>
+                    ¿Listo para <span style={{color:'var(--accent)'}}>digitalizar</span> tu negocio?
                 </h2>
-                <p style={{fontSize:'clamp(0.95rem,2vw,1.15rem)',color:'#5c5346',marginBottom:'2rem',lineHeight:'1.7'}}>
+                <p style={{fontSize:'clamp(0.95rem,2vw,1.15rem)',color:'var(--ink-soft)',marginBottom:'2rem',lineHeight:'1.7'}}>
                     Agenda una llamada gratuita y cuéntanos tu idea. Te asesoramos sin compromiso y te damos un presupuesto claro.
                 </p>
                 <button onClick={()=>document.getElementById('contacto').scrollIntoView({behavior:'smooth'})}
-                    style={{padding:'clamp(1rem,2vw,1.25rem) clamp(2rem,4vw,3rem)',background:'#1f1a14',color:'#f4ede0',
+                    style={{padding:'clamp(1rem,2vw,1.25rem) clamp(2rem,4vw,3rem)',background:'var(--ink)',color:'var(--bg)',
                     border:'none',borderRadius:'4px',fontFamily:'Outfit,sans-serif',fontWeight:'700',
                     fontSize:'clamp(0.95rem,2vw,1.1rem)',cursor:'pointer'}}>Agendar Llamada Gratis</button>
             </div>
@@ -502,13 +639,10 @@ const CTA = () => (
     </section>
 );
 
-/* ══════════════════════════════════════════════
-   CONTACT — formulario funcional vía mailto + WhatsApp
-══════════════════════════════════════════════ */
 const Contact = () => {
     const [form, setForm] = useState({nombre:'', email:'', telefono:'', mensaje:''});
     const [sending, setSending] = useState(false);
-    const [toast, setToast] = useState(null); // {type:'success'|'error', msg:''}
+    const [toast, setToast] = useState(null);
 
     const showToast = (type, msg) => {
         setToast({type, msg});
@@ -520,7 +654,6 @@ const Contact = () => {
     };
 
     const handleSubmit = () => {
-        // Basic validation
         if (!form.nombre.trim() || !form.email.trim() || !form.mensaje.trim()) {
             showToast('error', '⚠️ Por favor completa nombre, email y tu idea.');
             return;
@@ -532,7 +665,6 @@ const Contact = () => {
 
         setSending(true);
 
-        // Build mailto link — opens default mail client with pre-filled content
         const subject = encodeURIComponent(`[TaoTech] Solicitud de ${form.nombre}`);
         const body = encodeURIComponent(
 `Nombre: ${form.nombre}
@@ -543,11 +675,8 @@ Mensaje:
 ${form.mensaje}`
         );
         const mailtoLink = `mailto:taotech.co@gmail.com?subject=${subject}&body=${body}`;
-
-        // Open mail client
         window.location.href = mailtoLink;
 
-        // Small delay then show success + reset
         setTimeout(()=>{
             setSending(false);
             setForm({nombre:'', email:'', telefono:'', mensaje:''});
@@ -562,62 +691,57 @@ ${form.mensaje}`
 
     const inp = {
         width:'100%', padding:'clamp(0.8rem,2vw,1rem) clamp(1rem,2vw,1.25rem)',
-        border:'1.5px solid #d6c8af', borderRadius:'6px',
+        border:'1.5px solid var(--line)', borderRadius:'6px',
         fontFamily:'DM Sans,sans-serif', fontSize:'clamp(0.9rem,2vw,1rem)',
-        outline:'none', background:'#fffcf5', color:'#1f1a14', transition:'border-color 0.3s'
+        outline:'none', background:'var(--bg-input)', color:'var(--ink)', transition:'border-color 0.3s'
     };
 
     return (
         <>
-        {/* Toast notification */}
         {toast && (
             <div className={`toast ${toast.type}`}>{toast.msg}</div>
         )}
 
-        <section id="contacto" style={{padding:'clamp(60px,10vw,100px) 5%',background:'#f4ede0'}}>
+        <section id="contacto" style={{padding:'clamp(60px,10vw,100px) 5%',background:'var(--bg)'}}>
             <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',
                 gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,350px),1fr))',gap:'clamp(2rem,5vw,4rem)'}}>
 
-                {/* Left col — info */}
                 <AnimatedSection>
                     <div>
-                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'rgba(177,74,44,0.1)',
+                        <span style={{display:'inline-block',padding:'0.4rem 1rem',background:'var(--icon-bg)',
                             border:'1px solid rgba(177,74,44,0.2)',borderRadius:'4px',
-                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'#b14a2c',
+                            fontSize:'clamp(0.75rem,2vw,0.85rem)',fontWeight:'700',color:'var(--accent)',
                             marginBottom:'1rem',fontFamily:'JetBrains Mono,monospace',letterSpacing:'2px'}}>CONTACTO</span>
-                        <h2 style={{fontSize:'clamp(1.6rem,4vw,2.5rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1.5rem'}}>Hablemos de tu proyecto</h2>
-                        <p style={{color:'#5c5346',lineHeight:'1.8',marginBottom:'2rem',fontSize:'clamp(0.9rem,2vw,1rem)'}}>
+                        <h2 style={{fontSize:'clamp(1.6rem,4vw,2.5rem)',fontWeight:'800',color:'var(--ink)',marginBottom:'1.5rem'}}>Hablemos de tu proyecto</h2>
+                        <p style={{color:'var(--ink-soft)',lineHeight:'1.8',marginBottom:'2rem',fontSize:'clamp(0.9rem,2vw,1rem)'}}>
                             Estamos listos para escucharte. Cuéntanos tu idea y te responderemos en menos de 24 horas con una propuesta personalizada.
                         </p>
 
-                        {/* Email */}
                         <div style={{display:'flex',alignItems:'center',gap:'1rem',marginBottom:'1.5rem'}}>
                             <div style={{width:'clamp(45px,8vw,55px)',height:'clamp(45px,8vw,55px)',
-                                background:'rgba(177,74,44,0.1)',borderRadius:'8px',display:'flex',
+                                background:'var(--icon-bg)',borderRadius:'8px',display:'flex',
                                 alignItems:'center',justifyContent:'center',fontSize:'clamp(1.2rem,3vw,1.5rem)'}}>📧</div>
                             <div>
-                                <div style={{fontSize:'clamp(0.75rem,1.5vw,0.85rem)',color:'#5c5346',fontWeight:'600'}}>Email</div>
-                                <a href="mailto:taotech.co@gmail.com" style={{color:'#1f1a14',fontWeight:'700',fontSize:'clamp(0.85rem,2vw,1.05rem)',textDecoration:'none'}}>
+                                <div style={{fontSize:'clamp(0.75rem,1.5vw,0.85rem)',color:'var(--ink-soft)',fontWeight:'600'}}>Email</div>
+                                <a href="mailto:taotech.co@gmail.com" style={{color:'var(--ink)',fontWeight:'700',fontSize:'clamp(0.85rem,2vw,1.05rem)',textDecoration:'none'}}>
                                     taotech.co@gmail.com
                                 </a>
                             </div>
                         </div>
 
-                        {/* WhatsApp — botón funcional */}
                         <div style={{display:'flex',alignItems:'center',gap:'1rem',marginBottom:'2rem'}}>
                             <div style={{width:'clamp(45px,8vw,55px)',height:'clamp(45px,8vw,55px)',
-                                background:'rgba(177,74,44,0.1)',borderRadius:'8px',display:'flex',
+                                background:'var(--icon-bg)',borderRadius:'8px',display:'flex',
                                 alignItems:'center',justifyContent:'center',fontSize:'clamp(1.2rem,3vw,1.5rem)'}}>📱</div>
                             <div>
-                                <div style={{fontSize:'clamp(0.75rem,1.5vw,0.85rem)',color:'#5c5346',fontWeight:'600'}}>WhatsApp</div>
+                                <div style={{fontSize:'clamp(0.75rem,1.5vw,0.85rem)',color:'var(--ink-soft)',fontWeight:'600'}}>WhatsApp</div>
                                 <a href="https://wa.me/573227446219" target="_blank" rel="noopener noreferrer"
-                                    style={{color:'#1f1a14',fontWeight:'700',fontSize:'clamp(0.85rem,2vw,1.05rem)',textDecoration:'none'}}>
+                                    style={{color:'var(--ink)',fontWeight:'700',fontSize:'clamp(0.85rem,2vw,1.05rem)',textDecoration:'none'}}>
                                     +57 322 7446219
                                 </a>
                             </div>
                         </div>
 
-                        {/* Quick WhatsApp CTA */}
                         <button onClick={openWhatsApp} style={{
                             display:'flex', alignItems:'center', gap:'0.6rem',
                             padding:'0.85rem 1.5rem',
@@ -634,53 +758,52 @@ ${form.mensaje}`
                     </div>
                 </AnimatedSection>
 
-                {/* Right col — form */}
                 <AnimatedSection delay={0.2}>
-                    <div style={{background:'#ebe0cc',borderRadius:'8px',padding:'clamp(1.5rem,4vw,3rem)',border:'1px solid #d6c8af'}}>
-                        <h3 style={{fontSize:'clamp(1.2rem,3vw,1.5rem)',fontWeight:'800',color:'#1f1a14',marginBottom:'1.5rem'}}>Envíanos un mensaje</h3>
+                    <div style={{background:'var(--bg-soft)',borderRadius:'8px',padding:'clamp(1.5rem,4vw,3rem)',border:'1px solid var(--line)'}}>
+                        <h3 style={{fontSize:'clamp(1.2rem,3vw,1.5rem)',fontWeight:'800',color:'var(--ink)',marginBottom:'1.5rem'}}>Envíanos un mensaje</h3>
 
                         <div style={{marginBottom:'1rem'}}>
-                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Nombre completo *</label>
+                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'var(--ink-soft)',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Nombre completo *</label>
                             <input
                                 type="text" name="nombre" value={form.nombre}
                                 onChange={handleChange}
                                 style={inp} placeholder="Tu nombre"
-                                onFocus={e=>e.target.style.borderColor='#b14a2c'}
-                                onBlur={e=>e.target.style.borderColor='#d6c8af'}
+                                onFocus={e=>e.target.style.borderColor='var(--accent)'}
+                                onBlur={e=>e.target.style.borderColor='var(--line)'}
                             />
                         </div>
 
                         <div style={{marginBottom:'1rem'}}>
-                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Email *</label>
+                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'var(--ink-soft)',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Email *</label>
                             <input
                                 type="email" name="email" value={form.email}
                                 onChange={handleChange}
                                 style={inp} placeholder="tu@email.com"
-                                onFocus={e=>e.target.style.borderColor='#b14a2c'}
-                                onBlur={e=>e.target.style.borderColor='#d6c8af'}
+                                onFocus={e=>e.target.style.borderColor='var(--accent)'}
+                                onBlur={e=>e.target.style.borderColor='var(--line)'}
                             />
                         </div>
 
                         <div style={{marginBottom:'1rem'}}>
-                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Teléfono <span style={{fontWeight:'400',opacity:0.6}}>(opcional)</span></label>
+                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'var(--ink-soft)',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Teléfono <span style={{fontWeight:'400',opacity:0.6}}>(opcional)</span></label>
                             <input
                                 type="tel" name="telefono" value={form.telefono}
                                 onChange={handleChange}
                                 style={inp} placeholder="+57 300 000 0000"
-                                onFocus={e=>e.target.style.borderColor='#b14a2c'}
-                                onBlur={e=>e.target.style.borderColor='#d6c8af'}
+                                onFocus={e=>e.target.style.borderColor='var(--accent)'}
+                                onBlur={e=>e.target.style.borderColor='var(--line)'}
                             />
                         </div>
 
                         <div style={{marginBottom:'1.5rem'}}>
-                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'#5c5346',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Cuéntanos tu idea *</label>
+                            <label style={{display:'block',marginBottom:'0.5rem',fontWeight:'600',color:'var(--ink-soft)',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>Cuéntanos tu idea *</label>
                             <textarea
                                 name="mensaje" value={form.mensaje}
                                 onChange={handleChange}
                                 style={{...inp,minHeight:'110px',resize:'vertical'}}
                                 placeholder="Describe brevemente lo que necesitas..."
-                                onFocus={e=>e.target.style.borderColor='#b14a2c'}
-                                onBlur={e=>e.target.style.borderColor='#d6c8af'}
+                                onFocus={e=>e.target.style.borderColor='var(--accent)'}
+                                onBlur={e=>e.target.style.borderColor='var(--line)'}
                             />
                         </div>
 
@@ -688,21 +811,19 @@ ${form.mensaje}`
                             onClick={handleSubmit}
                             disabled={sending}
                             style={{width:'100%',padding:'clamp(0.85rem,2vw,1.1rem)',
-                                background: sending ? '#5c5346' : '#1f1a14',
-                                color:'#f4ede0',border:'none',borderRadius:'6px',
+                                background: sending ? 'var(--ink-soft)' : 'var(--ink)',
+                                color:'var(--bg)',border:'none',borderRadius:'6px',
                                 fontFamily:'Outfit,sans-serif',fontWeight:'700',
                                 fontSize:'clamp(0.9rem,2vw,1rem)',cursor: sending ? 'not-allowed' : 'pointer',
                                 transition:'all 0.2s', letterSpacing:'0.5px'
                             }}
-                            onMouseEnter={e=>{ if(!sending) e.currentTarget.style.background='#3a3028'; }}
-                            onMouseLeave={e=>{ if(!sending) e.currentTarget.style.background='#1f1a14'; }}
                         >
                             {sending ? 'Abriendo correo…' : 'Enviar Mensaje ✉️'}
                         </button>
 
-                        <p style={{textAlign:'center',marginTop:'1rem',fontSize:'0.8rem',color:'#5c5346'}}>
+                        <p style={{textAlign:'center',marginTop:'1rem',fontSize:'0.8rem',color:'var(--ink-soft)'}}>
                             También puedes escribirnos directamente por{' '}
-                            <span onClick={openWhatsApp} style={{color:'#b14a2c',fontWeight:'600',cursor:'pointer',textDecoration:'underline'}}>
+                            <span onClick={openWhatsApp} style={{color:'var(--accent)',fontWeight:'600',cursor:'pointer',textDecoration:'underline'}}>
                                 WhatsApp
                             </span>
                         </p>
@@ -715,50 +836,50 @@ ${form.mensaje}`
 };
 
 const Footer = () => (
-    <footer style={{padding:'clamp(2.5rem,5vw,4rem) 5% clamp(1.5rem,3vw,2rem)',background:'#1f1a14',color:'#f4ede0'}}>
+    <footer style={{padding:'clamp(2.5rem,5vw,4rem) 5% clamp(1.5rem,3vw,2rem)',background:'var(--bg-dark)',color:'#f4ede0'}}>
         <div style={{maxWidth:'1200px',margin:'0 auto'}}>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,200px),1fr))',
                 gap:'clamp(1.5rem,4vw,3rem)',marginBottom:'2rem',paddingBottom:'2rem',
                 borderBottom:'1px solid rgba(244,237,224,0.1)'}}>
                 <div style={{maxWidth:'300px'}}>
                     <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'1rem'}}>
-                        <TaoLogo size={35} dark={true}/>
+                        <TaoLogo size={35} forceDark={true}/>
                         <span style={{fontSize:'clamp(1.2rem,3vw,1.4rem)',fontWeight:'800',fontFamily:'Outfit,sans-serif'}}>
-                            Tao<span style={{color:'#b14a2c'}}>Tech</span>
+                            Tao<span style={{color:'#d96847'}}>Tech</span>
                         </span>
                     </div>
-                    <p style={{color:'#5c5346',lineHeight:'1.7',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>
+                    <p style={{color:'#a89a82',lineHeight:'1.7',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>
                         Tecnología accesible para todos. Conectamos personas y negocios con las mejores soluciones digitales.
                     </p>
                 </div>
                 <div>
                     <h4 style={{fontWeight:'700',marginBottom:'1rem',fontSize:'clamp(0.9rem,2vw,1rem)',color:'#d6c8af'}}>Servicios</h4>
                     {['Desarrollo Web','Apps Móviles','Software a Medida','Diseño UI/UX'].map((l,i)=>(
-                        <a key={i} href="#servicios" style={{display:'block',color:'#5c5346',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{l}</a>
+                        <a key={i} href="#servicios" style={{display:'block',color:'#a89a82',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{l}</a>
                     ))}
                 </div>
                 <div>
                     <h4 style={{fontWeight:'700',marginBottom:'1rem',fontSize:'clamp(0.9rem,2vw,1rem)',color:'#d6c8af'}}>Empresa</h4>
                     {['Sobre Nosotros','Portafolio','Blog','Contacto'].map((l,i)=>(
-                        <a key={i} href="#" style={{display:'block',color:'#5c5346',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{l}</a>
+                        <a key={i} href="#" style={{display:'block',color:'#a89a82',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>{l}</a>
                     ))}
                 </div>
                 <div>
                     <h4 style={{fontWeight:'700',marginBottom:'1rem',fontSize:'clamp(0.9rem,2vw,1rem)',color:'#d6c8af'}}>Contacto</h4>
-                    <a href="mailto:taotech.co@gmail.com" style={{display:'block',color:'#5c5346',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>taotech.co@gmail.com</a>
-                    <a href="https://wa.me/573227446219" target="_blank" rel="noopener noreferrer" style={{display:'block',color:'#5c5346',textDecoration:'none',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>+57 322 7446219</a>
+                    <a href="mailto:taotech.co@gmail.com" style={{display:'block',color:'#a89a82',textDecoration:'none',marginBottom:'0.6rem',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>taotech.co@gmail.com</a>
+                    <a href="https://wa.me/573227446219" target="_blank" rel="noopener noreferrer" style={{display:'block',color:'#a89a82',textDecoration:'none',fontSize:'clamp(0.8rem,1.5vw,0.9rem)'}}>+57 322 7446219</a>
                 </div>
             </div>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'1rem'}}>
-                <p style={{color:'#5c5346',fontSize:'clamp(0.75rem,1.5vw,0.85rem)'}}>© 2025 TaoTech. Todos los derechos reservados.</p>
-                <p style={{color:'#5c5346',fontSize:'clamp(0.75rem,1.5vw,0.85rem)'}}>Hecho con ❤️ en Colombia</p>
+                <p style={{color:'#a89a82',fontSize:'clamp(0.75rem,1.5vw,0.85rem)'}}>© 2025 TaoTech. Todos los derechos reservados.</p>
+                <p style={{color:'#a89a82',fontSize:'clamp(0.75rem,1.5vw,0.85rem)'}}>Hecho con ❤️ en Colombia</p>
             </div>
         </div>
     </footer>
 );
 
 const App = () => (
-    <>
+    <ThemeProvider>
         <Navigation/>
         <Hero/>
         <TrustedBy/>
@@ -769,7 +890,7 @@ const App = () => (
         <CTA/>
         <Contact/>
         <Footer/>
-    </>
+    </ThemeProvider>
 );
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
